@@ -5,6 +5,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 import numpy as np
 import pybullet as p
 
+from predicators.settings import CFG
 from predicators.structs import Array, State
 
 try:
@@ -18,9 +19,8 @@ try:
     from igibson.robots.robot_base import \
         BaseRobot  # pylint: disable=unused-import
     from igibson.utils.checkpoint_utils import load_checkpoint
-except:
+except (ImportError, ModuleNotFoundError) as e:  # pragma: no cover
     pass
-from predicators.settings import CFG
 
 
 def get_aabb_volume(lo: Array, hi: Array) -> float:
