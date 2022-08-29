@@ -54,4 +54,5 @@ Often, features implemented in [the original codebase](https://github.com/Learni
 1. Fetch all the latest commits/changes to the original codebase: `git fetch --all`.
 1. Create a new branch: `git checkout -b <branch-name>`.
 1. Cherry-pick the commit from the original repo into the new branch: `git cherry-pick <hash-of-commit-from-original-repo>`
+    1. When you push this new branch with the cherry-picked commits, make sure you're pushing to this repo and not the original one!
 1. To keep PR's and reviews clean, always make a separate PR with changes that exclusively come from the original codebase, and write `[OG Predicators PR]` in the title.
