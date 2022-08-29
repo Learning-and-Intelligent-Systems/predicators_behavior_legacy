@@ -7,11 +7,10 @@ from typing import List, Sequence, Set, Union, cast
 import numpy as np
 from numpy.random._generator import Generator
 
+from predicators.behavior_utils.behavior_utils import check_nav_end_pose, \
+    load_checkpoint_state
 from predicators.envs import get_or_create_env
 from predicators.envs.behavior import BehaviorEnv
-from predicators.envs.behavior_options import \
-    _ON_TOP_RAY_CASTING_SAMPLING_PARAMS, check_nav_end_pose, \
-    load_checkpoint_state
 from predicators.envs.doors import DoorsEnv
 from predicators.envs.painting import PaintingEnv
 from predicators.envs.pddl_env import _PDDLEnv

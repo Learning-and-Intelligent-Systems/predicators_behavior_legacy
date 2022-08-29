@@ -5,18 +5,22 @@ from typing import List, Optional, Sequence, Tuple, Union
 import numpy as np
 import pybullet as p
 
-from predicators.structs import Array
+from predicators.structs import Array, State
 
 try:
     from igibson.envs.behavior_env import \
         BehaviorEnv  # pylint: disable=unused-import
+    from igibson.object_states.on_floor import \
+        RoomFloor  # pylint: disable=unused-import
     from igibson.objects.articulated_object import URDFObject
     from igibson.robots.behavior_robot import \
         BRBody  # pylint: disable=unused-import
     from igibson.robots.robot_base import \
         BaseRobot  # pylint: disable=unused-import
+    from igibson.utils.checkpoint_utils import load_checkpoint
 except:
     pass
+from predicators.settings import CFG
 
 
 def get_aabb_volume(lo: Array, hi: Array) -> float:
@@ -212,3 +216,106 @@ def get_delta_low_level_hand_action(
     )
 
     return action
+
+
+def check_nav_end_pose(
+        env: "BehaviorEnv", obj: Union["URDFObject", "RoomFloor"],
+        pos_offset: Array) -> Optional[Tuple[List[int], List[int]]]:
+    """Check that the robot can reach pos_offset from the obj without (1) being
+    in collision with anything, or (2) being blocked from obj by some other
+    solid object.
+
+    If this is true, return the ((x,y,z),(roll, pitch, yaw)), else
+    return None
+    """
+    valid_position = None
+    state = p.saveState()
+    obj_pos = obj.get_position()
+    pos = [
+        pos_offset[0] + obj_pos[0],
+        pos_offset[1] + obj_pos[1],
+        env.robots[0].initial_z_offset,
+    ]
+    yaw_angle = np.arctan2(pos_offset[1], pos_offset[0]) - np.pi
+    orn = [0, 0, yaw_angle]
+    env.robots[0].set_position_orientation(pos, p.getQuaternionFromEuler(orn))
+    eye_pos = env.robots[0].parts["eye"].get_position()
+    ray_test_res = p.rayTest(eye_pos, obj_pos)
+    # Test to see if the robot is obstructed by some object, but make sure
+    # that object is not either the robot's body or the object we want to
+    # pick up!
+    blocked = len(ray_test_res) > 0 and (ray_test_res[0][0] not in (
+        env.robots[0].parts["body"].get_body_id(),
+        obj.get_body_id(),
+    ))
+    if not detect_robot_collision(env.robots[0]) and not blocked:
+        valid_position = (pos, orn)
+
+    # if blocked:
+    #     logging.info(f"Params {pos_offset} blocked!")
+    # elif valid_position is None:
+    #     logging.info(f"Params {pos_offset} in collision!")
+
+    # if valid_position is not None:
+    #     logging.info(f"Params {pos_offset} is fine!")
+
+    p.restoreState(state)
+    p.removeState(state)
+
+    return valid_position
+
+
+def load_checkpoint_state(s: State,
+                          env: "BehaviorEnv",
+                          reset: bool = False) -> None:
+    """Sets the underlying iGibson environment to a particular saved state.
+
+    When reset is True we will create a new BehaviorEnv and load our
+    checkpoint into it. This will ensure that all the information from
+    previous environment steps are reset as well.
+    """
+    assert s.simulator_state is not None
+    # Get the new_task_num_task_instance_id associated with this state
+    # from s.simulator_state.
+    new_task_num_task_instance_id = (int(s.simulator_state.split("-")[0]),
+                                     int(s.simulator_state.split("-")[1]))
+    # If the new_task_num_task_instance_id is new, then we need to load
+    # a new iGibson behavior env with our random seed saved in
+    # env.new_task_num_task_instance_id_to_igibson_seed. Otherwise
+    # we're already in the correct environment and can just load the
+    # checkpoint. Also note that we overwrite the task.init saved checkpoint
+    # so that it's compatible with the new environment!
+    env.task_num = new_task_num_task_instance_id[0]
+    # Since demo trajectories seeds are not saved, a seed is generated here if
+    # one does not exist yet for the task num and task instance id pair.
+    if not new_task_num_task_instance_id in \
+        env.task_num_task_instance_id_to_igibson_seed:
+        env.task_num_task_instance_id_to_igibson_seed[
+            new_task_num_task_instance_id] = 0
+    if (new_task_num_task_instance_id != (env.task_num, env.task_instance_id)
+            and CFG.behavior_randomize_init_state) or reset:
+        env.task_instance_id = new_task_num_task_instance_id[1]
+        # Frame count is overwritten by set_igibson_behavior_env and needs to
+        # be preserved across resets. So we save it before and set it after
+        # we reset the env.
+        frame_count = env.igibson_behavior_env.simulator.frame_count
+        env.set_igibson_behavior_env(
+            task_instance_id=new_task_num_task_instance_id[1],
+            seed=env.task_num_task_instance_id_to_igibson_seed[
+                new_task_num_task_instance_id])
+        env.igibson_behavior_env.simulator.frame_count = frame_count
+        env.set_options()
+        env.current_ig_state_to_state(
+        )  # overwrite the old task_init checkpoint file!
+        env.igibson_behavior_env.reset()
+    load_checkpoint(
+        env.igibson_behavior_env.simulator,
+        f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
+        f"{CFG.behavior_task_name}__{CFG.num_train_tasks}__" +
+        f"{CFG.seed}__{env.task_num}__{env.task_instance_id}",
+        int(s.simulator_state.split("-")[2]))
+    np.random.seed(env.task_num_task_instance_id_to_igibson_seed[
+        new_task_num_task_instance_id])
+    # We step the environment to update the visuals of where the robot is!
+    env.igibson_behavior_env.step(
+        np.zeros(env.igibson_behavior_env.action_space.shape))

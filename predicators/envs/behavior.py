@@ -36,13 +36,14 @@ except (ImportError, ModuleNotFoundError) as e:
 from gym.spaces import Box
 
 from predicators import utils
+from predicators.behavior_utils.behavior_utils import load_checkpoint_state
+from predicators.behavior_utils.motion_planner_fns import make_grasp_plan, \
+    make_navigation_plan, make_placeontop_plan
 from predicators.behavior_utils.option_fns import create_grasp_policy, \
     create_navigate_policy, create_place_policy
 from predicators.behavior_utils.option_model_fns import \
     create_grasp_option_model, create_navigate_option_model, \
     create_place_option_model
-from predicators.behavior_utils.planner_fns import make_grasp_plan, \
-    make_navigation_plan, make_placeontop_plan
 from predicators.envs import BaseEnv
 from predicators.settings import CFG
 from predicators.structs import Action, Array, GroundAtom, Object, \
