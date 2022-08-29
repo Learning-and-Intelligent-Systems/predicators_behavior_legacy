@@ -480,12 +480,7 @@ def run_low_level_search(
         plan[cur_idx] = option
         # Increment cur_idx. It will be decremented later on if we get stuck.
         cur_idx += 1
-        skip = False
-        try:
-            option.initiable(state)
-        except:
-            skip = True  # pragma: no cover
-        if (not skip) and option.initiable(state):
+        if option.initiable(state):
             try:
                 next_state, num_actions = \
                     option_model.get_next_state_and_num_actions(state, option)

@@ -24,7 +24,7 @@ from predicators.structs import NSRT, Array, GroundAtom, LiftedAtom, Object, \
     ParameterizedOption, Predicate, State, Type, Variable
 from predicators.utils import null_sampler
 
-try:
+try:  # pragma: no cover
     from igibson.external.pybullet_tools.utils import get_aabb, get_aabb_extent
     from igibson.object_states.on_floor import \
         RoomFloor  # pylint: disable=unused-import
