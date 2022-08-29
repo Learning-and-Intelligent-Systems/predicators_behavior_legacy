@@ -123,6 +123,7 @@ def learn_nsrts_from_data(
     for nsrt in nsrts:
         logging.info(nsrt)
     logging.info("")
+
     return set(nsrts), segmented_trajs, seg_to_nsrt
 
 
