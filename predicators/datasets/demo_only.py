@@ -60,24 +60,24 @@ def create_demo_data(env: BaseEnv, train_tasks: List[Task],
         option_name_to_option = env.option_name_to_option
         for traj in dataset.trajectories:
             for i, act in enumerate(traj.actions):
-                if i != len(traj.actions) - 1:
-                    dummy_opt = act.get_option()
-                    gt_param_opt = option_name_to_option[dummy_opt.name]
-                    gt_opt = gt_param_opt.ground(dummy_opt.objects,
-                                                 dummy_opt.params)
-                    act.set_option(gt_opt)
-                else:
-                    gt_param_opt = option_name_to_option[dummy_opt.name]
-                    option = gt_param_opt.ground(dummy_opt.objects,
-                                                 dummy_opt.params)
-                    action_option = None
-                    for op in env.options:
-                        if op.name == option.name:
-                            action_option = op.ground(option.objects,
-                                                      option.params)
-                    assert action_option is not None
-                    action_option.memory = option.memory
-                    act.set_option(action_option)
+                dummy_opt = act.get_option()
+                # if i != len(traj.actions) - 1:
+                gt_param_opt = option_name_to_option[dummy_opt.name]
+                gt_opt = gt_param_opt.ground(dummy_opt.objects,
+                                             dummy_opt.params)
+                act.set_option(gt_opt)
+                # else:
+                #     gt_param_opt = option_name_to_option[dummy_opt.name]
+                #     gt_opt = gt_param_opt.ground(dummy_opt.objects,
+                #                                  dummy_opt.params)
+                #     action_option = None
+                #     for op in env.options:
+                #         if op.name == gt_opt.name:
+                #             action_option = op.ground(gt_opt.objects,
+                #                                       gt_opt.params)
+                #     assert action_option is not None
+                #     action_option.memory = gt_opt.memory
+                #     act.set_option(action_option)
     return dataset
 
 

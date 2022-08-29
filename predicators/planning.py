@@ -610,20 +610,9 @@ def _run_plan_with_option_model(
             next_state, _ = option_model.get_next_state_and_num_actions(
                 state, option)
         traj[idx + 1] = next_state
-        #
-        # if idx != len(plan) - 1:
-        #     actions[idx].set_option(option)
-        # else:
-        #     action_option = ParameterizedOption(
-        #         option.name, option.parent.types, option.parent.params_space,
-        #         option.policy,
-        #         option.initiable,
-        #         lambda s, m, o, p: True).ground(option.objects, option.params)
-        #     action_option.memory = option.memory
-        #     actions[idx].set_option(action_option)
-        #
         # Need to make a new option without policy, initiable, and
-        # terminal in order to make it a picklable trajectory.
+        # terminal in order to make it a picklable trajectory for
+        # BEHAVIOR environment trajectories.
         action_option = ParameterizedOption(
             option.name, option.parent.types, option.parent.params_space,
             lambda s, m, o, p: Action(np.array([0.0])),
