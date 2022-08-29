@@ -2830,9 +2830,9 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     f"Number of navigation samples: {num_samples_tried}")
             num_samples_tried += 1
 
-            assert check_nav_end_pose(env.igibson_behavior_env,
-                                      obj_to_sample_near,
-                                      sampler_output) is not None
+        assert check_nav_end_pose(env.igibson_behavior_env,
+                                    obj_to_sample_near,
+                                    sampler_output) is not None
         return sampler_output
 
     # Grasp sampler definition.
