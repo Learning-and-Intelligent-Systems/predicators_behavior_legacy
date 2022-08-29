@@ -1,3 +1,5 @@
+"""Tests for behavior_utils."""
+
 import numpy as np
 import pytest
 

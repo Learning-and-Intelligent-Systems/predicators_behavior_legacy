@@ -1,3 +1,5 @@
+"""Utility functions for using iGibson and BEHAVIOR."""
+
 from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np

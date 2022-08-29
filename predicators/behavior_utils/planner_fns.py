@@ -1,12 +1,12 @@
-"""Contains functions that return plans (i.e: series of low-level motions) for
-the BEHAVIOR Robot to execute."""
+"""Functions that return plans (i.e: series of low-level motions) for the
+BEHAVIOR Robot to execute."""
 
 import logging
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
-import scipy
 import pybullet as p
+import scipy
 from numpy.random._generator import Generator
 
 from predicators.behavior_utils.behavior_utils import detect_robot_collision, \
@@ -15,41 +15,36 @@ from predicators.behavior_utils.behavior_utils import detect_robot_collision, \
 from predicators.structs import Array
 
 try:
-    import pybullet as p
     from igibson import object_states
     from igibson.envs.behavior_env import \
         BehaviorEnv  # pylint: disable=unused-import
-    from igibson.external.pybullet_tools.utils import CIRCULAR_LIMITS, \
-        get_aabb, get_aabb_extent
+    from igibson.external.pybullet_tools.utils import CIRCULAR_LIMITS
     from igibson.object_states.on_floor import \
         RoomFloor  # pylint: disable=unused-import
     from igibson.objects.articulated_object import URDFObject
-    from igibson.robots.behavior_robot import \
-        BRBody  # pylint: disable=unused-import
-    from igibson.utils import sampling_utils
     from igibson.utils.behavior_robot_planning_utils import \
         plan_base_motion_br, plan_hand_motion_br
 
 except (ImportError, ModuleNotFoundError) as e:
     pass
 
-# TODO: Update docstrings for all functions here!
 
-
-def navigate_to_obj_pos(
+def make_navigation_plan(
     env: "BehaviorEnv",
     obj: Union["URDFObject", "RoomFloor"],
     pos_offset: Array,
     rng: Optional[Generator] = None
 ) -> Optional[Tuple[List[List[float]], List[List[float]]]]:
-    """Parameterized controller for navigation.
+    """Function to return a series of actions to navigate to a particular
+    offset from an object's position.
 
-    Runs motion planning to find a feasible trajectory to a certain x,y
-    position offset from obj and selects an orientation such that the
-    robot is facing the object. If the navigation is infeasible, returns
-    an indication to this effect (None). Otherwise, returns the plan,
-    which is a list of list of robot base poses to move to, as well as
-    the original euler angle orientation of the robot body.
+    If the navigation is infeasible (i.e, final pose is in collision),
+    returns an indication to this effect (None). Otherwise, returns the
+    plan, which is a series of (x, y, rot) for the base to move to. Also
+    returns the original euler angle orientation of the robot body. Note
+    that depending on CFG.behavior_option_model_rrt, this function might
+    or might not run RRT to find the plan. If it does not run RRT, the
+    plan will only be one step (i.e, the final pose to be navigated to).
     """
     if rng is None:
         rng = np.random.default_rng(23)
@@ -155,20 +150,24 @@ def navigate_to_obj_pos(
     return plan, original_orientation
 
 
-def grasp_obj_at_pos(
+def make_grasp_plan(
     env: "BehaviorEnv",
     obj: Union["URDFObject", "RoomFloor"],
     grasp_offset: Array,
     rng: Optional[Generator] = None,
 ) -> Optional[Tuple[List[List[float]], List[List[float]]]]:
-    """Parameterized controller for grasping.
+    """Function to return a series of actions to grasp an object at a
+    particular offset from an object's position.
 
-    Runs motion planning to find a feasible trajectory to a certain
-    x,y,z position offset from obj and selects an orientation such that
-    the palm is facing the object. If the grasp is infeasible, returns
-    an indication to this effect (None). Otherwise, returns the plan,
-    which is a list of list of hand poses, as well as the original euler
-    angle orientation of the hand.
+    If the grasp is infeasible (i.e, final pose is in collision or agent
+    is already holding a different object, etc.), returns an indication
+    to this effect (None). Otherwise, returns the plan, which is (x, y,
+    z, roll, pitch, yaw) waypoints for the hand to pass through. Also
+    returns the original euler angle orientation of the hand. Note that
+    depending on CFG.behavior_option_model_rrt, this function might or
+    might not run RRT to find the plan. If it does not run RRT, the plan
+    will only be one step (i.e, the pose to move the hand to to try
+    grasping the object).
     """
     if rng is None:
         rng = np.random.default_rng(23)
@@ -344,20 +343,24 @@ def grasp_obj_at_pos(
     return plan, original_orientation
 
 
-def place_ontop_obj_pos(
+def make_placeontop_plan(
     env: "BehaviorEnv",
     obj: Union["URDFObject", "RoomFloor"],
     place_rel_pos: Array,
     rng: Optional[Generator] = None,
 ) -> Optional[Tuple[List[List[float]], List[List[float]]]]:
-    """Parameterized controller for placeOnTop.
+    """Function to return a series of actions to place an object at a
+    particular offset from another object's position.
 
-    Runs motion planning to find a feasible trajectory to a certain
-    offset from obj and selects an orientation such that the palm is
-    facing the object. If the placement is infeasible, returns an
+    If the placement is infeasible (i.e, final pose is in collision or
+    agent is not currently holding an object, etc.), returns an
     indication to this effect (None). Otherwise, returns the plan, which
-    is a list of list of hand poses, as well as the original euler angle
-    orientation of the hand.
+    is (x, y, z, roll, pitch, yaw) waypoints for the hand to pass
+    through. Also returns the original euler angle orientation of the
+    hand. Note that depending on CFG.behavior_option_model_rrt, this
+    function might or might not run RRT to find the plan. If it does not
+    run RRT, the plan will only be one step (i.e, the pose to move the
+    hand to to try placing the object).
     """
     if rng is None:
         rng = np.random.default_rng(23)
