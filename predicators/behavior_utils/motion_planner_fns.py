@@ -1,5 +1,5 @@
-"""Functions that return plans (i.e: series of low-level motions) for the
-BEHAVIOR Robot to execute."""
+"""Functions that return motion plans (i.e: series of low-level motions) for
+the BEHAVIOR Robot to execute."""
 
 import logging
 from typing import List, Optional, Tuple, Union

@@ -1,5 +1,5 @@
-"""Functions that consume a plan for a BEHAVIOR robot and return an functions
-that can be used to step each of the actions in the plan.
+"""Functions that consume a plan for a BEHAVIOR robot and return functions that
+can be used to step each of the actions in the plan.
 
 This requires implementing some closed-loop control to make sure that
 the states expected by the plan are actually reached.
@@ -73,9 +73,8 @@ def create_navigate_policy(
 
             return low_level_action, False
 
-        if (len(plan) == 1
-            ):  # In this case, we're at the final position we wanted
-            # to reach
+        # In this case, we're at the final position we wanted to reach.
+        if len(plan) == 1:
             low_level_action = np.zeros(env.action_space.shape, dtype=float)
             done_bit = True
             logging.info("PRIMITIVE: navigation policy completed execution!")

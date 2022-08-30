@@ -251,14 +251,6 @@ def check_nav_end_pose(
     if not detect_robot_collision(env.robots[0]) and not blocked:
         valid_position = (pos, orn)
 
-    # if blocked:
-    #     logging.info(f"Params {pos_offset} blocked!")
-    # elif valid_position is None:
-    #     logging.info(f"Params {pos_offset} in collision!")
-
-    # if valid_position is not None:
-    #     logging.info(f"Params {pos_offset} is fine!")
-
     p.restoreState(state)
     p.removeState(state)
 
