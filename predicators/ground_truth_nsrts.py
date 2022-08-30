@@ -3009,7 +3009,6 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             raise ValueError(
                 f"Unexpected base option name: {base_option_name}")
 
-
     return nsrts
 
 
