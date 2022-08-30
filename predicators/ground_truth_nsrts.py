@@ -2793,9 +2793,10 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
 
     # Dummy sampler definition. Useful for open and close.
     def dummy_param_sampler(state: State, goal: Set[GroundAtom],
-                                rng: Generator,
-                                objects: Sequence["URDFObject"]) -> Array:
+                            rng: Generator,
+                            objects: Sequence["URDFObject"]) -> Array:
         """Dummy sampler."""
+        del state, goal, rng, objects
         return np.array([0.0, 0.0, 0.0])
 
     # NavigateTo sampler definition.
@@ -3024,15 +3025,14 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             # Open.
             parameters = [open_obj]
             option_vars = [open_obj]
-            preconditions: Set[LiftedAtom] = {_get_lifted_atom("reachable", [open_obj])}
+            preconditions = {_get_lifted_atom("reachable", [open_obj])}
             add_effects = {_get_lifted_atom("open", [open_obj])}
-            delete_effects = {}
-            ignore_effects = {}
+            delete_effects = set()
+            ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_open)}", parameters,
-                preconditions, add_effects, delete_effects,
-                ignore_effects, option, option_vars,
-                lambda s, g, r, o: dummy_param_sampler(
+                preconditions, add_effects, delete_effects, ignore_effects,
+                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
                     s,
                     g,
                     r,
@@ -3041,7 +3041,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                         if isinstance(o_i, Object) else o_i for o_i in o
                     ],
                 ))
-            nsrts.add(nsrt)     
+            nsrts.add(nsrt)
 
         else:
             raise ValueError(

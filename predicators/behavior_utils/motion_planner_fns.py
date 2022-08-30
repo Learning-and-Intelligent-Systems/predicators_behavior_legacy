@@ -36,14 +36,13 @@ def make_dummy_plan(
     rng: Optional[Generator] = None
 ) -> Optional[Tuple[List[List[float]], List[List[float]]]]:
     """Function to return a defualt 'dummy' plan.
-    
-    This is useful when implementing option models/controllers
-    where a plan is not actually necessary (e.g. magic open and
-    close actions). Note though that doing this is technically
-    cheating...
-    """
-    return ([[0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0, 0.0]])
 
+    This is useful when implementing option models/controllers where a
+    plan is not actually necessary (e.g. magic open and close actions).
+    Note though that doing this is technically cheating...
+    """
+    del env, obj, continuous_params, rng
+    return ([[0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0, 0.0]])
 
 
 def make_navigation_plan(
