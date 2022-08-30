@@ -49,12 +49,13 @@ class OracleApproach(BilevelPlanningApproach):
         return self._nsrts
 
     def recompute_nsrts(self, env: BaseEnv) -> None:
-        # If the env is BEHAVIOR the types and therefore
-        # initial_predicates and initial_options could
-        # have changed.
+        """Function to recompute NSRTs given environment change."""
         if CFG.env == "behavior":  # pragma: no cover
-            self._initial_predicates, _ = utils.parse_config_excluded_predicates(
-                env)
+            # If the env is BEHAVIOR the types and therefore
+            # initial_predicates and initial_options could
+            # have changed.
+            self._initial_predicates, _ = \
+                utils.parse_config_excluded_predicates(env)
             self._initial_options = env.options
         self._nsrts = get_gt_nsrts(self._initial_predicates,
                                    self._initial_options)
