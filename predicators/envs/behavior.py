@@ -572,6 +572,8 @@ class BehaviorEnv(BaseEnv):
             ig_obj, "states") and object_states.Open in ig_obj.states
         if obj_openable:
             return not ig_obj.states[object_states.Open].get_value()
+        # NOTE: If an object is not openable, we default to setting
+        # it to not be closed.
         return False
 
     @staticmethod
