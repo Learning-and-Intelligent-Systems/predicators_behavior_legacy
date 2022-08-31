@@ -248,8 +248,10 @@ class BehaviorEnv(BaseEnv):
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
-            # import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             if 'plaything.n.01_1' == atom.objects[0].name:
+                goal.add(atom)
+            if 'plaything.n.01_2' == atom.objects[0].name:
                 goal.add(atom)
         return goal
 
