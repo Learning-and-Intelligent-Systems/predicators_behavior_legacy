@@ -2790,6 +2790,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
     op_name_count_pick = itertools.count()
     op_name_count_place = itertools.count()
     op_name_count_open = itertools.count()
+    op_name_count_close = itertools.count()
 
     # Dummy sampler definition. Useful for open and close.
     def dummy_param_sampler(state: State, goal: Set[GroundAtom],
@@ -3031,6 +3032,35 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_open)}", parameters,
+                preconditions, add_effects, delete_effects, ignore_effects,
+                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
+                    s,
+                    g,
+                    r,
+                    [
+                        env.object_to_ig_object(o_i)
+                        if isinstance(o_i, Object) else o_i for o_i in o
+                    ],
+                ))
+            nsrts.add(nsrt)
+        
+        elif base_option_name == "Close":
+            assert len(option_arg_type_names) == 1
+            close_obj_type_name = option_arg_type_names[0]
+            close_obj_type = type_name_to_type[close_obj_type_name]
+            close_obj = Variable("?obj", close_obj_type)
+            # We don't need an NSRT to close the agent.
+            if close_obj_type_name == "agent":
+                continue
+            # Open.
+            parameters = [close_obj]
+            option_vars = [close_obj]
+            preconditions = {_get_lifted_atom("reachable", [close_obj]), _get_lifted_atom("open", [close_obj])}
+            add_effects = set()
+            delete_effects = {_get_lifted_atom("open", [close_obj])}
+            ignore_effects: Set[Predicate] = set()
+            nsrt = NSRT(
+                f"{option.name}-{next(op_name_count_close)}", parameters,
                 preconditions, add_effects, delete_effects, ignore_effects,
                 option, option_vars, lambda s, g, r, o: dummy_param_sampler(
                     s,

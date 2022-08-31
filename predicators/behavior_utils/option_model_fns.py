@@ -164,3 +164,27 @@ def create_open_option_model(
         env.step(np.zeros(env.action_space.shape))
 
     return openObjectOptionModel
+
+
+def create_close_option_model(
+        plan: List[List[float]], _original_orientation: List[List[float]],
+        obj_to_close: "URDFObject") -> Callable[[State, "BehaviorEnv"], None]:
+    """Instantiates and returns an open option model given a dummy plan."""
+    del plan
+
+    def closeObjectOptionModel(_init_state: State, env: "BehaviorEnv") -> None:
+        if np.linalg.norm(
+                np.array(obj_to_close.get_position()) -
+                np.array(env.robots[0].get_position())) < 2:
+            if hasattr(obj_to_close,
+                       "states") and object_states.Open in obj_to_close.states:
+                obj_to_close.states[object_states.Open].set_value(False)
+            else:
+                logging.debug("PRIMITIVE close failed, cannot be opened")
+        else:
+            logging.debug("PRIMITIVE close failed, too far")
+        obj_to_close.force_wakeup()
+        # Step the simulator to update visuals.
+        env.step(np.zeros(env.action_space.shape))
+
+    return closeObjectOptionModel
