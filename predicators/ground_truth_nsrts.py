@@ -3025,7 +3025,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             # Open.
             parameters = [open_obj]
             option_vars = [open_obj]
-            preconditions = {_get_lifted_atom("reachable", [open_obj])}
+            preconditions = {_get_lifted_atom("reachable", [open_obj]), _get_lifted_atom("closed", [open_obj])}
             add_effects = {_get_lifted_atom("open", [open_obj])}
             delete_effects = set()
             ignore_effects: Set[Predicate] = set()
