@@ -44,7 +44,7 @@ from predicators.behavior_utils.option_fns import create_dummy_policy, \
 from predicators.behavior_utils.option_model_fns import \
     create_close_option_model, create_grasp_option_model, \
     create_navigate_option_model, create_open_option_model, \
-    create_place_option_model
+    create_place_option_model, create_place_inside_option_model
 from predicators.envs import BaseEnv
 from predicators.settings import CFG
 from predicators.structs import Action, Array, GroundAtom, Object, \
@@ -104,7 +104,7 @@ class BehaviorEnv(BaseEnv):
             [List[List[float]], List[List[float]], "URDFObject"],
             Callable[[State, "behavior_env.BehaviorEnv"], None]]] = [
                 create_navigate_option_model, create_grasp_option_model,
-                create_place_option_model, create_open_option_model, create_close_option_model
+                create_place_option_model, create_open_option_model, create_close_option_model, create_place_inside_option_model
             ]
 
         # name, planner_fn, option_policy_fn, option_model_fn,
@@ -119,6 +119,8 @@ class BehaviorEnv(BaseEnv):
             ("Open", planner_fns[3], option_policy_fns[3], option_model_fns[3],
              3, 1, (-1.0, 1.0)),
             ("Close", planner_fns[3], option_policy_fns[3], option_model_fns[4],
+             3, 1, (-1.0, 1.0)),
+            ("PlaceInside", planner_fns[3], option_policy_fns[3], option_model_fns[5],
              3, 1, (-1.0, 1.0)),
         ]
         self._options: Set[ParameterizedOption] = set()
@@ -253,7 +255,7 @@ class BehaviorEnv(BaseEnv):
         types_lst = sorted(self.types)  # for determinism
         # First, extract predicates from iGibson
         for bddl_name in [
-                # "inside",
+                "inside",
                 # "nextto",
                 "ontop",
                 # "under",

@@ -11,6 +11,7 @@ from predicators.structs import State
 
 try:
     from igibson import object_states
+    from igibson.object_states.utils import sample_kinematics
     from igibson.envs.behavior_env import \
         BehaviorEnv  # pylint: disable=unused-import
     from igibson.objects.articulated_object import \
@@ -169,7 +170,7 @@ def create_open_option_model(
 def create_close_option_model(
         plan: List[List[float]], _original_orientation: List[List[float]],
         obj_to_close: "URDFObject") -> Callable[[State, "BehaviorEnv"], None]:
-    """Instantiates and returns an open option model given a dummy plan."""
+    """Instantiates and returns an close option model given a dummy plan."""
     del plan
 
     def closeObjectOptionModel(_init_state: State, env: "BehaviorEnv") -> None:
@@ -188,3 +189,83 @@ def create_close_option_model(
         env.step(np.zeros(env.action_space.shape))
 
     return closeObjectOptionModel
+
+
+
+def create_place_inside_option_model(
+        plan: List[List[float]], _original_orientation: List[List[float]],
+        obj_to_place: "URDFObject") -> Callable[[State, "BehaviorEnv"], None]:
+    """Instantiates and returns an placeInside option model given a dummy plan."""
+    del plan
+
+    def placeInsideObjectOptionModel(_init_state: State, env: "BehaviorEnv") -> None:
+        obj_in_hand = env.scene.get_objects()[env.robots[0].parts["right_hand"].object_in_hand]
+        rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
+        )
+        rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
+        if obj_in_hand is not None and obj_in_hand != obj_to_place and isinstance(obj_to_place, URDFObject):
+            logging.debug("PRIMITIVE:attempt to place {} inside {}".format(obj_in_hand.name, obj_to_place.name))
+            if np.linalg.norm(np.array(obj_to_place.get_position()) - np.array(env.robots[0].get_position())) < 2:
+                if (
+                    hasattr(obj_to_place, "states")
+                    and object_states.Open in obj_to_place.states
+                    and obj_to_place.states[object_states.Open].get_value()
+                ) or (hasattr(obj_to_place, "states") and not object_states.Open in obj_to_place.states):
+                    state = p.saveState()
+                    result = sample_kinematics(
+                        "inside",
+                        obj_in_hand,
+                        obj_to_place,
+                        True,
+                        use_ray_casting_method=True,
+                        max_trials=20,
+                        skip_falling=True,
+                    )
+                    if result:
+                        logging.debug(
+                            "PRIMITIVE: place {} inside {} success".format(obj_in_hand.name, obj_to_place.name)
+                        )
+                        target_pos = obj_in_hand.get_position()
+                        target_orn = obj_in_hand.get_orientation()
+                        env.robots[0].parts["right_hand"].set_position_orientation(
+                            target_pos, p.getQuaternionFromEuler(target_orn))
+                        env.robots[0].parts["right_hand"].force_release_obj()
+                        obj_to_place.force_wakeup()
+                        # this is running a zero action to step simulator
+                        env.step(np.zeros(env.action_space.shape))
+                        # reset the released object to zero velocity so it doesn't
+                        # fly away because of residual warp speeds from teleportation!
+                        p.resetBaseVelocity(
+                            obj_in_hand,
+                            linearVelocity=[0, 0, 0],
+                            angularVelocity=[0, 0, 0],
+                        )
+                        env.robots[0].parts["right_hand"].set_position_orientation(
+                            rh_orig_grasp_postion, rh_orig_grasp_orn)
+                        # this is running a series of zero action to step simulator
+                        # to let the object fall into its place
+                        for _ in range(15):
+                            env.step(np.zeros(env.action_space.shape))
+                    else:
+                        logging.debug(
+                            "PRIMITIVE: place {} inside {} fail, sampling fail".format(
+                                obj_in_hand.name, obj_to_place.name
+                            )
+                        )
+                        p.removeState(state)
+                else:
+                    logging.debug(
+                        "PRIMITIVE: place {} inside {} fail, need open not open".format(
+                            obj_in_hand.name, obj_to_place.name
+                        )
+                    )
+            else:
+                logging.debug(
+                    "PRIMITIVE: place {} inside {} fail, too far".format(obj_in_hand.name, obj_to_place.name)
+                )
+
+        obj_to_place.force_wakeup()
+        # Step the simulator to update visuals.
+        env.step(np.zeros(env.action_space.shape))
+
+    return placeInsideObjectOptionModel

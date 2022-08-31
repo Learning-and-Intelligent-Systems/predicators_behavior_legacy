@@ -2791,6 +2791,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
     op_name_count_place = itertools.count()
     op_name_count_open = itertools.count()
     op_name_count_close = itertools.count()
+    op_name_count_place_inside = itertools.count()
 
     # Dummy sampler definition. Useful for open and close.
     def dummy_param_sampler(state: State, goal: Set[GroundAtom],
@@ -2864,7 +2865,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
     # Place OnTop sampler definition.
     def place_ontop_obj_pos_sampler(
             state: State, goal: Set[GroundAtom], rng: Generator,
-            obj: Union["URDFObject", "RoomFloor"]) -> Array:
+            objects: Union["URDFObject", "RoomFloor"]) -> Array:
         """Sampler for placeOnTop option."""
         del state, goal
         assert rng is not None
@@ -2872,8 +2873,8 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
         # objB is the surface that it must place onto.
         # The BEHAVIOR NSRT's are designed such that objA is the 0th
         # argument, and objB is the last.
-        objA = obj[0]
-        objB = obj[-1]
+        objA = objects[0]
+        objB = objects[-1]
 
         params = {
             "max_angle_with_z_axis": 0.17,
@@ -3006,7 +3007,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     lambda s, g, r, o: place_ontop_obj_pos_sampler(
                         s,
                         g,
-                        obj=[
+                        objects=[
                             env.object_to_ig_object(o_i)
                             if isinstance(o_i, Object) else o_i for o_i in o
                         ],
@@ -3072,6 +3073,49 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     ],
                 ))
             nsrts.add(nsrt)
+
+        elif base_option_name == "PlaceInside":
+            assert len(option_arg_type_names) == 1
+            surf_obj_type_name = option_arg_type_names[0]
+            surf_obj_type = type_name_to_type[surf_obj_type_name]
+            surf_obj = Variable("?surf", surf_obj_type)
+            # We don't need an NSRT to place objects on top of the
+            # agent because this is never necessary.
+            if surf_obj.type.name == "agent":
+                continue
+            # We need to place the object we're holding!
+            for held_obj_types in sorted(env.types):
+                held_obj = Variable("?held", held_obj_types)
+                parameters = [held_obj, surf_obj]
+                option_vars = [surf_obj]
+                handempty = _get_lifted_atom("handempty", [])
+                held_holding = _get_lifted_atom("holding", [held_obj])
+                surf_reachable = _get_lifted_atom("reachable", [surf_obj])
+                held_reachable = _get_lifted_atom("reachable", [held_obj])
+                inside = _get_lifted_atom("inside", [held_obj, surf_obj])
+                preconditions = {held_holding, surf_reachable}
+                add_effects = {inside, handempty, held_reachable}
+                delete_effects = {held_holding}
+                nsrt = NSRT(
+                    f"{option.name}-{next(op_name_count_place_inside)}",
+                    parameters,
+                    preconditions,
+                    add_effects,
+                    delete_effects,
+                    set(),
+                    option,
+                    option_vars,
+                    lambda s, g, r, o: dummy_param_sampler(
+                        s,
+                        g,
+                        objects=[
+                            env.object_to_ig_object(o_i)
+                            if isinstance(o_i, Object) else o_i for o_i in o
+                        ],
+                        rng=r,
+                    ),
+                )
+                nsrts.add(nsrt)
 
         else:
             raise ValueError(
