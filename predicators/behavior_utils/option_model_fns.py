@@ -223,43 +223,44 @@ def create_place_inside_option_model(
                         use_ray_casting_method=True,
                         max_trials=200,
                     )
-                    # TODO Attempted to just use sample_cuboid but also doesn't work
-                    sampling_results = [[None]]
+                    # # TODO Attempted to just use sample_cuboid but also doesn't work
+                    # sampling_results = [[None]]
 
-                    while sampling_results[0][0] is None:
-                        objA = obj_in_hand
-                        objB = obj_to_place
+                    # while sampling_results[0][0] is None:
+                    #     objA = obj_in_hand
+                    #     objB = obj_to_place
 
-                        params = {
-                            "max_angle_with_z_axis": 0.17,
-                            "bimodal_stdev_fraction": 0.4,
-                            "bimodal_mean_fraction": 0.5,
-                            "max_sampling_attempts": 100,
-                            "aabb_offset": -0.01,
-                        }
-                        aabb = get_aabb(objA.get_body_id())
-                        aabb_extent = get_aabb_extent(aabb)
+                    #     params = {
+                    #         "max_angle_with_z_axis": 0.17,
+                    #         "bimodal_stdev_fraction": 0.4,
+                    #         "bimodal_mean_fraction": 0.5,
+                    #         "max_sampling_attempts": 100,
+                    #         "aabb_offset": -0.01,
+                    #     }
+                    #     aabb = get_aabb(objA.get_body_id())
+                    #     aabb_extent = get_aabb_extent(aabb)
 
-                        rng = np.random.default_rng(0)
-                        random_seed_int = rng.integers(10000000)
-                        sampling_results = sampling_utils.sample_cuboid_on_object(
-                            objB,
-                            num_samples=1,
-                            cuboid_dimensions=aabb_extent,
-                            axis_probabilities=[0, 0, 1],
-                            refuse_downwards=True,
-                            random_seed_number=random_seed_int,
-                            **params,
-                        )
+                    #     rng = np.random.default_rng(0)
+                    #     random_seed_int = rng.integers(10000000)
+                    #     sampling_results = sampling_utils.sample_cuboid_on_object(
+                    #         objB,
+                    #         num_samples=1,
+                    #         cuboid_dimensions=aabb_extent,
+                    #         axis_probabilities=[0, 0, 1],
+                    #         refuse_downwards=True,
+                    #         random_seed_number=random_seed_int,
+                    #         **params,
+                    #     )
 
-                    import ipdb; ipdb.set_trace()
-                    #
+                    # import ipdb; ipdb.set_trace()
+                    # #
                     if result:
                         logging.info(
                             "PRIMITIVE: place {} inside {} success".format(obj_in_hand.name, obj_to_place.name)
                         )
                         target_pos = obj_in_hand.get_position()
                         target_orn = obj_in_hand.get_orientation()
+                        import ipdb; ipdb.set_trace()
                         env.robots[0].parts["right_hand"].set_position_orientation(
                             target_pos, p.getQuaternionFromEuler(target_orn))
                         env.robots[0].parts["right_hand"].force_release_obj()

@@ -2960,7 +2960,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 preconditions = {handempty, targ_reachable, ontop}
                 add_effects = {targ_holding}
                 delete_effects = {handempty, ontop, targ_reachable}
-                ignore_effects = {pred_name_to_pred['ontop-trash_can-room_floor'], pred_name_to_pred['ontop-plate-countertop']}
+                ignore_effects = set()
                 nsrt = NSRT(
                     f"{option.name}-{next(op_name_count_pick)}",
                     parameters,
@@ -3093,7 +3093,8 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 held_holding = _get_lifted_atom("holding", [held_obj])
                 surf_reachable = _get_lifted_atom("reachable", [surf_obj])
                 held_reachable = _get_lifted_atom("reachable", [held_obj])
-                inside = _get_lifted_atom("inside", [held_obj, surf_obj])
+                inside = _get_lifted_atom("inside", [held_obj, surf_obj]) 
+                # TODO might need tp put open in precondition
                 preconditions = {held_holding, surf_reachable}
                 add_effects = {inside, handempty, held_reachable}
                 delete_effects = {held_holding}

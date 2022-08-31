@@ -113,7 +113,7 @@ def make_navigation_plan(
         env.robots[0].parts["body"].get_body_id(),
         obj.get_body_id(),
     ))
-    if not detect_robot_collision(env.robots[0]) and not blocked:
+    if not detect_robot_collision(env.robots[0]):
         valid_position = (pos, orn)
 
     if valid_position is None:

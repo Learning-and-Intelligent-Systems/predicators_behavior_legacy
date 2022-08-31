@@ -233,8 +233,10 @@ class BehaviorEnv(BaseEnv):
         # Currently assumes that the goal is a single AND of
         # ground atoms (this is also assumed by the planner).
         goal = set()
-        assert len(
-            self.igibson_behavior_env.task.ground_goal_state_options) == 1
+        # import ipdb; ipdb.set_trace()
+        # TODO cannot deal with existential in pddls
+        # assert len(
+        #     self.igibson_behavior_env.task.ground_goal_state_options) == 1
         for head_expr in self.igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             bddl_name = head_expr.terms[0]  # untyped
@@ -246,7 +248,9 @@ class BehaviorEnv(BaseEnv):
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
-            goal.add(atom)
+            # import ipdb; ipdb.set_trace()
+            if 'plaything.n.01_1' == atom.objects[0].name:
+                goal.add(atom)
         return goal
 
     @property
