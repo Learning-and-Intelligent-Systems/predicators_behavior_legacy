@@ -10,6 +10,8 @@ import pybullet as p
 from predicators.structs import State
 
 try:
+    from igibson.external.pybullet_tools.utils import get_aabb, get_aabb_extent
+    from igibson.utils import sampling_utils
     from igibson import object_states
     from igibson.object_states.utils import sample_kinematics
     from igibson.envs.behavior_env import \
@@ -157,9 +159,9 @@ def create_open_option_model(
                        "states") and object_states.Open in obj_to_open.states:
                 obj_to_open.states[object_states.Open].set_value(True)
             else:
-                logging.debug("PRIMITIVE open failed, cannot be opened")
+                logging.info("PRIMITIVE open failed, cannot be opened")
         else:
-            logging.debug("PRIMITIVE open failed, too far")
+            logging.info("PRIMITIVE open failed, too far")
         obj_to_open.force_wakeup()
         # Step the simulator to update visuals.
         env.step(np.zeros(env.action_space.shape))
@@ -181,9 +183,9 @@ def create_close_option_model(
                        "states") and object_states.Open in obj_to_close.states:
                 obj_to_close.states[object_states.Open].set_value(False)
             else:
-                logging.debug("PRIMITIVE close failed, cannot be opened")
+                logging.info("PRIMITIVE close failed, cannot be opened")
         else:
-            logging.debug("PRIMITIVE close failed, too far")
+            logging.info("PRIMITIVE close failed, too far")
         obj_to_close.force_wakeup()
         # Step the simulator to update visuals.
         env.step(np.zeros(env.action_space.shape))
@@ -204,7 +206,7 @@ def create_place_inside_option_model(
         )
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
         if obj_in_hand is not None and obj_in_hand != obj_to_place and isinstance(obj_to_place, URDFObject):
-            logging.debug("PRIMITIVE:attempt to place {} inside {}".format(obj_in_hand.name, obj_to_place.name))
+            logging.info("PRIMITIVE:attempt to place {} inside {}".format(obj_in_hand.name, obj_to_place.name))
             if np.linalg.norm(np.array(obj_to_place.get_position()) - np.array(env.robots[0].get_position())) < 2:
                 if (
                     hasattr(obj_to_place, "states")
@@ -212,17 +214,48 @@ def create_place_inside_option_model(
                     and obj_to_place.states[object_states.Open].get_value()
                 ) or (hasattr(obj_to_place, "states") and not object_states.Open in obj_to_place.states):
                     state = p.saveState()
+                    # TODO fix sample_kinematics
                     result = sample_kinematics(
                         "inside",
                         obj_in_hand,
                         obj_to_place,
                         True,
                         use_ray_casting_method=True,
-                        max_trials=20,
-                        skip_falling=True,
+                        max_trials=200,
                     )
+                    # TODO Attempted to just use sample_cuboid but also doesn't work
+                    sampling_results = [[None]]
+
+                    while sampling_results[0][0] is None:
+                        objA = obj_in_hand
+                        objB = obj_to_place
+
+                        params = {
+                            "max_angle_with_z_axis": 0.17,
+                            "bimodal_stdev_fraction": 0.4,
+                            "bimodal_mean_fraction": 0.5,
+                            "max_sampling_attempts": 100,
+                            "aabb_offset": -0.01,
+                        }
+                        aabb = get_aabb(objA.get_body_id())
+                        aabb_extent = get_aabb_extent(aabb)
+
+                        rng = np.random.default_rng(0)
+                        random_seed_int = rng.integers(10000000)
+                        sampling_results = sampling_utils.sample_cuboid_on_object(
+                            objB,
+                            num_samples=1,
+                            cuboid_dimensions=aabb_extent,
+                            axis_probabilities=[0, 0, 1],
+                            refuse_downwards=True,
+                            random_seed_number=random_seed_int,
+                            **params,
+                        )
+
+                    import ipdb; ipdb.set_trace()
+                    #
                     if result:
-                        logging.debug(
+                        logging.info(
                             "PRIMITIVE: place {} inside {} success".format(obj_in_hand.name, obj_to_place.name)
                         )
                         target_pos = obj_in_hand.get_position()
@@ -247,21 +280,25 @@ def create_place_inside_option_model(
                         for _ in range(15):
                             env.step(np.zeros(env.action_space.shape))
                     else:
-                        logging.debug(
+                        logging.info(
                             "PRIMITIVE: place {} inside {} fail, sampling fail".format(
                                 obj_in_hand.name, obj_to_place.name
                             )
                         )
                         p.removeState(state)
                 else:
-                    logging.debug(
+                    logging.info(
                         "PRIMITIVE: place {} inside {} fail, need open not open".format(
                             obj_in_hand.name, obj_to_place.name
                         )
                     )
             else:
-                logging.debug(
+                logging.info(
                     "PRIMITIVE: place {} inside {} fail, too far".format(obj_in_hand.name, obj_to_place.name)
+                )
+        else:
+            logging.info(
+                    "PRIMITIVE: place failed with invalid obj params."
                 )
 
         obj_to_place.force_wakeup()

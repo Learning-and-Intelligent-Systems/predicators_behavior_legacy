@@ -2960,13 +2960,14 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 preconditions = {handempty, targ_reachable, ontop}
                 add_effects = {targ_holding}
                 delete_effects = {handempty, ontop, targ_reachable}
+                ignore_effects = {pred_name_to_pred['ontop-trash_can-room_floor'], pred_name_to_pred['ontop-plate-countertop']}
                 nsrt = NSRT(
                     f"{option.name}-{next(op_name_count_pick)}",
                     parameters,
                     preconditions,
                     add_effects,
                     delete_effects,
-                    set(),
+                    ignore_effects,
                     option,
                     option_vars,
                     grasp_obj_param_sampler,
