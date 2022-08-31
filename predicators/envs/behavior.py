@@ -262,6 +262,7 @@ class BehaviorEnv(BaseEnv):
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
+            import ipdb; ipdb.set_trace()
             goal.add(atom)
         return goal
 
