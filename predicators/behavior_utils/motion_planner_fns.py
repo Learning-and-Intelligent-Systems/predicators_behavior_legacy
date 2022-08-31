@@ -113,7 +113,7 @@ def make_navigation_plan(
         env.robots[0].parts["body"].get_body_id(),
         obj.get_body_id(),
     ))
-    if not detect_robot_collision(env.robots[0]):
+    if not detect_robot_collision(env.robots[0]) and not blocked:
         valid_position = (pos, orn)
 
     if valid_position is None:
@@ -359,7 +359,7 @@ def make_grasp_plan(
     return plan, original_orientation
 
 
-def make_placeontop_plan(
+def make_place_plan(
     env: "BehaviorEnv",
     obj: Union["URDFObject", "RoomFloor"],
     place_rel_pos: Array,

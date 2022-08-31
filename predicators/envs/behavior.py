@@ -39,7 +39,7 @@ from gym.spaces import Box
 from predicators import utils
 from predicators.behavior_utils.behavior_utils import load_checkpoint_state
 from predicators.behavior_utils.motion_planner_fns import make_dummy_plan, \
-    make_grasp_plan, make_navigation_plan, make_placeontop_plan
+    make_grasp_plan, make_navigation_plan, make_place_plan
 from predicators.behavior_utils.option_fns import create_dummy_policy, \
     create_grasp_policy, create_navigate_policy, create_place_policy
 from predicators.behavior_utils.option_model_fns import \
@@ -91,7 +91,7 @@ class BehaviorEnv(BaseEnv):
             "behavior_env.BehaviorEnv", Union[
                 "URDFObject", "RoomFloor"], Array, Optional[Generator]
         ], Optional[Tuple[List[List[float]], List[List[float]]]]]] = [
-            make_navigation_plan, make_grasp_plan, make_placeontop_plan,
+            make_navigation_plan, make_grasp_plan, make_place_plan,
             make_dummy_plan
         ]
         option_policy_fns: List[
@@ -122,7 +122,7 @@ class BehaviorEnv(BaseEnv):
              3, 1, (-1.0, 1.0)),
             ("Close", planner_fns[3], option_policy_fns[3],
              option_model_fns[4], 3, 1, (-1.0, 1.0)),
-            ("PlaceInside", planner_fns[3], option_policy_fns[3],
+            ("PlaceInside", planner_fns[2], option_policy_fns[3],
              option_model_fns[5], 3, 1, (-1.0, 1.0)),
         ]
         self._options: Set[ParameterizedOption] = set()
@@ -235,10 +235,8 @@ class BehaviorEnv(BaseEnv):
         # Currently assumes that the goal is a single AND of
         # ground atoms (this is also assumed by the planner).
         goal = set()
-        # import ipdb; ipdb.set_trace()
-        # TODO cannot deal with existential in pddls
-        # assert len(
-        #     self.igibson_behavior_env.task.ground_goal_state_options) == 1
+        assert len(
+            self.igibson_behavior_env.task.ground_goal_state_options) == 1
         for head_expr in self.igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             # BDDL expresses negative goals (such as 'not open').
@@ -262,8 +260,11 @@ class BehaviorEnv(BaseEnv):
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
-            import ipdb; ipdb.set_trace()
-            goal.add(atom)
+            # import ipdb; ipdb.set_trace()
+            if atom.objects[0].name == 'oatmeal.n.01_1':
+                goal.add(atom)
+            if atom.objects[0].name == 'oatmeal.n.01_2':
+                goal.add(atom)
         return goal
 
     @property

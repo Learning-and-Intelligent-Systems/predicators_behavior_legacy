@@ -2908,6 +2908,52 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
         rnd_params = np.subtract(sampling_results[0][0], objB.get_position())
         return rnd_params
 
+    # Place Inside sampler definition.
+    def place_inside_obj_pos_sampler(
+            state: State, goal: Set[GroundAtom], rng: Generator,
+            objects: Union["URDFObject", "RoomFloor"]) -> Array:
+        """Sampler for placeOnTop option."""
+        del state, goal
+        assert rng is not None
+        # objA is the object the robot is currently holding, and
+        # objB is the surface that it must place onto.
+        # The BEHAVIOR NSRT's are designed such that objA is the 0th
+        # argument, and objB is the last.
+        objA = objects[0]
+        objB = objects[-1]
+
+        params = {
+            "max_angle_with_z_axis": 0.17,
+            "bimodal_stdev_fraction": 0.4,
+            "bimodal_mean_fraction": 0.5,
+            "max_sampling_attempts": 100,
+            "aabb_offset": -0.01,
+        }
+        aabb = get_aabb(objA.get_body_id())
+        aabb_extent = get_aabb_extent(aabb)
+
+        random_seed_int = rng.integers(10000000)
+        sampling_results = sampling_utils.sample_cuboid_on_object(
+            objB,
+            num_samples=1,
+            cuboid_dimensions=aabb_extent,
+            axis_probabilities=[0, 0, 1],
+            refuse_downwards=True,
+            random_seed_number=random_seed_int,
+            **params,
+        )
+
+        if sampling_results[0] is None or sampling_results[0][0] is None:
+            # If sampling fails, returns a random set of params
+            return np.array([
+                rng.uniform(-0.5, 0.5),
+                rng.uniform(-0.5, 0.5),
+                rng.uniform(0.3, 1.0)
+            ])
+
+        rnd_params = np.subtract(sampling_results[0][0], objB.get_position())
+        return rnd_params
+
     for option in env.options:
         split_name = option.name.split("-")
         base_option_name = split_name[0]
@@ -2960,14 +3006,13 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 preconditions = {handempty, targ_reachable, ontop}
                 add_effects = {targ_holding}
                 delete_effects = {handempty, ontop, targ_reachable}
-                ignore_effects = set()
                 nsrt = NSRT(
                     f"{option.name}-{next(op_name_count_pick)}",
                     parameters,
                     preconditions,
                     add_effects,
                     delete_effects,
-                    ignore_effects,
+                    set(),
                     option,
                     option_vars,
                     grasp_obj_param_sampler,
@@ -3034,11 +3079,10 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             }
             add_effects = {_get_lifted_atom("open", [open_obj])}
             delete_effects = {closed_predicate}
-            ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_open)}", parameters,
-                preconditions, add_effects, delete_effects, ignore_effects,
-                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
+                preconditions, add_effects, delete_effects, set(), option,
+                option_vars, lambda s, g, r, o: dummy_param_sampler(
                     s,
                     g,
                     r,
@@ -3066,11 +3110,10 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             }
             add_effects = {_get_lifted_atom("closed", [close_obj])}
             delete_effects = {_get_lifted_atom("open", [close_obj])}
-            ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_close)}", parameters,
-                preconditions, add_effects, delete_effects, ignore_effects,
-                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
+                preconditions, add_effects, delete_effects, set(), option,
+                option_vars, lambda s, g, r, o: dummy_param_sampler(
                     s,
                     g,
                     r,
@@ -3113,7 +3156,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     set(),
                     option,
                     option_vars,
-                    lambda s, g, r, o: dummy_param_sampler(
+                    lambda s, g, r, o: place_inside_obj_pos_sampler(
                         s,
                         g,
                         objects=[
@@ -3142,11 +3185,10 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             }
             add_effects = {_get_lifted_atom("open", [open_obj])}
             delete_effects = {closed_predicate}
-            ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_open)}", parameters,
-                preconditions, add_effects, delete_effects, ignore_effects,
-                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
+                preconditions, add_effects, delete_effects, set(), option,
+                option_vars, lambda s, g, r, o: dummy_param_sampler(
                     s,
                     g,
                     r,
