@@ -3119,6 +3119,35 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 )
                 nsrts.add(nsrt)
 
+        elif base_option_name == "Open":
+            assert len(option_arg_type_names) == 1
+            open_obj_type_name = option_arg_type_names[0]
+            open_obj_type = type_name_to_type[open_obj_type_name]
+            open_obj = Variable("?obj", open_obj_type)
+            # We don't need an NSRT to open the agent.
+            if open_obj_type_name == "agent":
+                continue
+            # Open.
+            parameters = [open_obj]
+            option_vars = [open_obj]
+            preconditions = {_get_lifted_atom("reachable", [open_obj])}
+            add_effects = {_get_lifted_atom("open", [open_obj])}
+            delete_effects = set()
+            ignore_effects: Set[Predicate] = set()
+            nsrt = NSRT(
+                f"{option.name}-{next(op_name_count_open)}", parameters,
+                preconditions, add_effects, delete_effects, ignore_effects,
+                option, option_vars, lambda s, g, r, o: dummy_param_sampler(
+                    s,
+                    g,
+                    r,
+                    [
+                        env.object_to_ig_object(o_i)
+                        if isinstance(o_i, Object) else o_i for o_i in o
+                    ],
+                ))
+            nsrts.add(nsrt)
+
         else:
             raise ValueError(
                 f"Unexpected base option name: {base_option_name}")
