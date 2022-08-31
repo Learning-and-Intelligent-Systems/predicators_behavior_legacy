@@ -260,11 +260,7 @@ class BehaviorEnv(BaseEnv):
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
-            # import ipdb; ipdb.set_trace()
-            if atom.objects[0].name == 'oatmeal.n.01_1':
-                goal.add(atom)
-            if atom.objects[0].name == 'oatmeal.n.01_2':
-                goal.add(atom)
+            goal.add(atom)
         return goal
 
     @property
