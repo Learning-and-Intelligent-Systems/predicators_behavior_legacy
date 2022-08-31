@@ -3028,9 +3028,12 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             # Open.
             parameters = [open_obj]
             option_vars = [open_obj]
-            preconditions = {_get_lifted_atom("reachable", [open_obj])}
+            closed_predicate = _get_lifted_atom("closed", [open_obj])
+            preconditions = {
+                _get_lifted_atom("reachable", [open_obj]), closed_predicate
+            }
             add_effects = {_get_lifted_atom("open", [open_obj])}
-            delete_effects = set()
+            delete_effects = {closed_predicate}
             ignore_effects: Set[Predicate] = set()
             nsrt = NSRT(
                 f"{option.name}-{next(op_name_count_open)}", parameters,
@@ -3097,8 +3100,8 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 surf_reachable = _get_lifted_atom("reachable", [surf_obj])
                 held_reachable = _get_lifted_atom("reachable", [held_obj])
                 inside = _get_lifted_atom("inside", [held_obj, surf_obj])
-                # TODO might need tp put open in precondition
-                preconditions = {held_holding, surf_reachable}
+                open_surf = _get_lifted_atom("open", [surf_obj])
+                preconditions = {held_holding, surf_reachable, open_surf}
                 add_effects = {inside, handempty, held_reachable}
                 delete_effects = {held_holding}
                 nsrt = NSRT(
