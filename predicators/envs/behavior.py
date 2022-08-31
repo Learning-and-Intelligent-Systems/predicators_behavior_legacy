@@ -44,7 +44,7 @@ from predicators.behavior_utils.option_fns import create_dummy_policy, \
 from predicators.behavior_utils.option_model_fns import \
     create_close_option_model, create_grasp_option_model, \
     create_navigate_option_model, create_open_option_model, \
-    create_place_option_model, create_place_inside_option_model
+    create_place_inside_option_model, create_place_option_model
 from predicators.envs import BaseEnv
 from predicators.settings import CFG
 from predicators.structs import Action, Array, GroundAtom, Object, \
@@ -104,7 +104,8 @@ class BehaviorEnv(BaseEnv):
             [List[List[float]], List[List[float]], "URDFObject"],
             Callable[[State, "behavior_env.BehaviorEnv"], None]]] = [
                 create_navigate_option_model, create_grasp_option_model,
-                create_place_option_model, create_open_option_model, create_close_option_model, create_place_inside_option_model
+                create_place_option_model, create_open_option_model,
+                create_close_option_model, create_place_inside_option_model
             ]
 
         # name, planner_fn, option_policy_fn, option_model_fn,
@@ -118,10 +119,10 @@ class BehaviorEnv(BaseEnv):
              option_model_fns[2], 3, 1, (-1.0, 1.0)),
             ("Open", planner_fns[3], option_policy_fns[3], option_model_fns[3],
              3, 1, (-1.0, 1.0)),
-            ("Close", planner_fns[3], option_policy_fns[3], option_model_fns[4],
-             3, 1, (-1.0, 1.0)),
-            ("PlaceInside", planner_fns[3], option_policy_fns[3], option_model_fns[5],
-             3, 1, (-1.0, 1.0)),
+            ("Close", planner_fns[3], option_policy_fns[3],
+             option_model_fns[4], 3, 1, (-1.0, 1.0)),
+            ("PlaceInside", planner_fns[3], option_policy_fns[3],
+             option_model_fns[5], 3, 1, (-1.0, 1.0)),
         ]
         self._options: Set[ParameterizedOption] = set()
         for (name, planner_fn, policy_fn, option_model_fn, param_dim, num_args,
@@ -242,17 +243,13 @@ class BehaviorEnv(BaseEnv):
             bddl_name = head_expr.terms[0]  # untyped
             # TODO cannot use not.
             assert bddl_name is not 'not'
-            ig_objs = [self._name_to_ig_object(t) for t in head_expr.terms[1:]] 
+            ig_objs = [self._name_to_ig_object(t) for t in head_expr.terms[1:]]
             objects = [self._ig_object_to_object(i) for i in ig_objs]
             pred_name = self._create_type_combo_name(bddl_name,
                                                      [o.type for o in objects])
             pred = self._name_to_predicate(pred_name)
             atom = GroundAtom(pred, objects)
-            #import ipdb; ipdb.set_trace()
-            if 'plaything.n.01_1' == atom.objects[0].name:
-                goal.add(atom)
-            if 'plaything.n.01_2' == atom.objects[0].name:
-                goal.add(atom)
+            goal.add(atom)
         return goal
 
     @property
