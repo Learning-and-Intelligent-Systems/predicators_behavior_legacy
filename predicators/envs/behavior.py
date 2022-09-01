@@ -235,8 +235,8 @@ class BehaviorEnv(BaseEnv):
         # Currently assumes that the goal is a single AND of
         # ground atoms (this is also assumed by the planner).
         goal = set()
-        assert len(
-            self.igibson_behavior_env.task.ground_goal_state_options) == 1
+        # assert len(
+        #     self.igibson_behavior_env.task.ground_goal_state_options) == 1
         for head_expr in self.igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             # BDDL expresses negative goals (such as 'not open').

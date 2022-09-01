@@ -159,6 +159,7 @@ def _sesame_plan_with_astar(
         all_reachable_atoms = utils.get_reachable_atoms(
             nonempty_ground_nsrts, init_atoms)
         if check_dr_reachable and not task.goal.issubset(all_reachable_atoms):
+            import ipdb; ipdb.set_trace()
             raise PlanningFailure(f"Goal {task.goal} not dr-reachable")
         reachable_nsrts = [
             nsrt for nsrt in nonempty_ground_nsrts
@@ -339,9 +340,9 @@ def _skeleton_generator(
             visited_atom_sets.add(frozen_atoms)
         # Good debug point #1: print out the skeleton here to see what
         # the high-level search is doing. You can accomplish this via:
-        # for act in node.skeleton:
-        #     logging.info(f"{act.name} {act.objects}")
-        # logging.info("")
+        for act in node.skeleton:
+            logging.info(f"{act.name} {act.objects}")
+        logging.info("")
         if task.goal.issubset(node.atoms):
             # If this skeleton satisfies the goal, yield it.
             metrics["num_skeletons_optimized"] += 1
