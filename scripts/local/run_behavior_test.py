@@ -1,6 +1,8 @@
-import os
-import json
+"""Runs BEHAVIOR oracle with the given NUM_TEST, SEED, and TIMEOUT on all
+tasks_to_test and their corresponding scene."""
 
+import json
+import os
 
 NUM_TEST = 1
 SEED = 0
@@ -11,21 +13,33 @@ f = open(path_to_file)
 data = json.load(f)
 f.close()
 
-tasks_to_test = ['collecting_aluminum_cans', 'throwing_away_leftovers', 'packing_bags_or_suitcase', 'packing_boxes_for_household_move_or_trip', 'opening_presents', 'organizing_file_cabinet', 'locking_every_window', 'packing_car_for_trip', 're-shelving_library_books', 'storing_food', 'organizing_boxes_in_garage', 'putting_leftovers_away', 'unpacking_suitcase', 'putting_away_toys', 'boxing_books_up_for_storage', 'sorting_books', 'clearing_the_table_after_dinner', 'opening_packages', 'picking_up_take-out_food', 'collect_misplaced_items', 'locking_every_door', 'putting_dishes_away_after_cleaning', 'picking_up_trash', 'cleaning_a_car', 'packing_food_for_work']
+tasks_to_test = [
+    'collecting_aluminum_cans', 'throwing_away_leftovers',
+    'packing_bags_or_suitcase', 'packing_boxes_for_household_move_or_trip',
+    'opening_presents', 'organizing_file_cabinet', 'locking_every_window',
+    'packing_car_for_trip', 're-shelving_library_books', 'storing_food',
+    'organizing_boxes_in_garage', 'putting_leftovers_away',
+    'unpacking_suitcase', 'putting_away_toys', 'boxing_books_up_for_storage',
+    'sorting_books', 'clearing_the_table_after_dinner', 'opening_packages',
+    'picking_up_take-out_food', 'collect_misplaced_items',
+    'locking_every_door', 'putting_dishes_away_after_cleaning',
+    'picking_up_trash', 'cleaning_a_car', 'packing_food_for_work'
+]
 
 # Create commands to run
 cmds = []
 for task, scenes in data.items():
     if task in tasks_to_test:
         for scene in scenes:
-            logfolder = os.path.join("logs", f"{task}_{scene}_{SEED}"
-                                        f"_{NUM_TEST}_{TIMEOUT}/")
+            logfolder = os.path.join(
+                "logs", f"{task}_{scene}_{SEED}"
+                f"_{NUM_TEST}_{TIMEOUT}/")
             try:
                 os.mkdir(logfolder)
             except OSError:
                 os.rmdir(logfolder)
                 os.mkdir(logfolder)
-            
+
             cmds.append("python predicators/main.py "
                         "--env behavior "
                         "--approach oracle "
@@ -47,4 +61,3 @@ num_cmds = len(cmds)
 for i, cmd in enumerate(cmds):
     print(f"********* RUNNING COMMAND {i+1} of {num_cmds} *********")
     result = os.popen(cmd).read()
-
