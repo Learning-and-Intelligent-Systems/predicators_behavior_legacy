@@ -388,7 +388,7 @@ def make_place_plan(
                      f"/inside {obj.name} with params {place_rel_pos}")
     except ValueError:
         logging.info("Cannot place; either no object in hand or holding "
-                     "the object to be placed on top of!")
+                     "the object to be placed on-top/inside of!")
         return None
 
     # if the object in the agent's hand is None or not equal to the object
