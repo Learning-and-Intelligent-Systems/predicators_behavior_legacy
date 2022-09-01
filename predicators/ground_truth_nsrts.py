@@ -3120,7 +3120,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             close_obj = Variable("?obj", close_obj_type)
             # We don't need an NSRT to close objects that are not
             # openable.
-            if open_obj_type.name not in OPENABLE_OBJECT_TYPES:
+            if close_obj_type.name not in OPENABLE_OBJECT_TYPES:
                 continue
             parameters = [close_obj]
             option_vars = [close_obj]
