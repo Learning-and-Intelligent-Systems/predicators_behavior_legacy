@@ -4,7 +4,7 @@ import json
 
 NUM_TEST = 1
 SEED = 0
-TIMEOUT = 100
+TIMEOUT = 1000
 
 path_to_file = "predicators/behavior_utils/task_to_preselected_scenes.json"
 f = open(path_to_file)
@@ -37,7 +37,7 @@ for task, scenes in data.items():
                         f"--behavior_task_name {task} "
                         f"--seed {SEED} "
                         f"--offline_data_planning_timeout {TIMEOUT} "
-                        f"--timeout {NUM_TEST} "
+                        f"--timeout {TIMEOUT} "
                         "--behavior_option_model_eval True "
                         "--plan_only_eval True "
                         f"--results_dir {logfolder}")
