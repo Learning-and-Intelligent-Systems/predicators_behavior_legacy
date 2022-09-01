@@ -44,7 +44,7 @@ for task, scenes in data.items():
 
 # Run the commands in order.
 num_cmds = len(cmds)
-for i, cmd in enumerate(cmds[15:17]):
+for i, cmd in enumerate(cmds):
     print(f"********* RUNNING COMMAND {i+1} of {num_cmds} *********")
     result = os.popen(cmd).read()
 
