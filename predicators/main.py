@@ -396,7 +396,7 @@ def _save_test_results(results: Metrics,
     avg_suc_time = results["avg_suc_time"]
     logging.info(f"Tasks solved: {num_solved} / {num_total}")
     logging.info(f"Average time for successes: {avg_suc_time:.5f} seconds")
-    if CFG.env == "behavior":
+    if CFG.env == "behavior":  # pragma: no cover
         outfile = (f"{CFG.results_dir}/{utils.get_config_path_str()}__"
                    f"{online_learning_cycle}__{CFG.behavior_task_name}__"
                    f"{CFG.behavior_scene_name}.pkl")
