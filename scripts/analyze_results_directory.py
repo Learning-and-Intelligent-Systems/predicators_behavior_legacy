@@ -116,7 +116,7 @@ def create_raw_dataframe(
             run_data_defaultdict.update(config)
         else:
             run_data_defaultdict = outdata
-        if len(filepath[8:-4].split("__")) > 7: # pragma: no cover
+        if len(filepath[8:-4].split("__")) > 7:  # pragma: no cover
             # Environment is a BEHAVIOR environment with task and scene name.
             (env, approach, seed, excluded_predicates, included_options,
              experiment_id, online_learning_cycle, task_name,
