@@ -7,8 +7,9 @@ from typing import List, Sequence, Set, Union, cast
 import numpy as np
 from numpy.random._generator import Generator
 
-from predicators.behavior_utils.behavior_utils import check_nav_end_pose, \
-    load_checkpoint_state, PICK_PLACE_OBJECT_TYPES, PLACE_SURFACE_OBJECT_TYPES
+from predicators.behavior_utils.behavior_utils import \
+    PICK_PLACE_OBJECT_TYPES, PLACE_SURFACE_OBJECT_TYPES, check_nav_end_pose, \
+    load_checkpoint_state
 from predicators.envs import get_or_create_env
 from predicators.envs.behavior import BehaviorEnv
 from predicators.envs.doors import DoorsEnv
