@@ -8,7 +8,8 @@ import numpy as np
 from numpy.random._generator import Generator
 
 from predicators.behavior_utils.behavior_utils import OPENABLE_OBJECT_TYPES, \
-    PICK_PLACE_OBJECT_TYPES, PLACE_ONTOP_SURFACE_OBJECT_TYPES, PLACE_INTO_SURFACE_OBJECT_TYPES, check_nav_end_pose, \
+    PICK_PLACE_OBJECT_TYPES, PLACE_INTO_SURFACE_OBJECT_TYPES, \
+    PLACE_ONTOP_SURFACE_OBJECT_TYPES, check_nav_end_pose, \
     load_checkpoint_state
 from predicators.envs import get_or_create_env
 from predicators.envs.behavior import BehaviorEnv
@@ -3166,7 +3167,8 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             for held_obj_types in sorted(env.types):
                 # If the held object is not in these object types, we do not
                 # have to make a NSRT with this type.
-                if held_obj_types.name not in PICK_PLACE_OBJECT_TYPES or held_obj_types.name == surf_obj_type.name:
+                if held_obj_types.name not in PICK_PLACE_OBJECT_TYPES or \
+                    held_obj_types.name == surf_obj_type.name:
                     continue
                 held_obj = Variable("?held", held_obj_types)
                 parameters = [held_obj, surf_obj]
