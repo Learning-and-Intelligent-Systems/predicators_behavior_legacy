@@ -3116,10 +3116,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             nsrts.add(nsrt)
 
         elif base_option_name == "Close":
-            try:
-                assert len(option_arg_type_names) == 1
-            except:
-                import ipdb; ipdb.set_trace()
+            assert len(option_arg_type_names) == 1
             close_obj_type_name = option_arg_type_names[0]
             close_obj_type = type_name_to_type[close_obj_type_name]
             close_obj = Variable("?obj", close_obj_type)
@@ -3210,8 +3207,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                         ],
                         rng=r,
                     ),
-                )
-                
+                ) 
                 nsrts.add(openable_nsrt)
                 # NSRT for placing into a not-openable surface.
                 not_openable_nsrt = NSRT(
