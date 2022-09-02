@@ -104,8 +104,8 @@ PICK_PLACE_OBJECT_TYPES = {
     'stout', 'dishtowel', 'paperback_book', 'casserole', 'earring',
     'peppermint', 'cruciferous_vegetable', 'soup_ladle', 'jean', 'teddy',
     'chestnut', 'sauce', 'piece_of_cloth', 'whitefish', 'siren', 'balloon',
-    'celery', 'hot_pepper', 'raisin', 'sugar_jar', 'toy',
-    'sticky_note', 't-shirt'
+    'celery', 'hot_pepper', 'raisin', 'sugar_jar', 'toy', 'sticky_note',
+    't-shirt'
 }
 PLACE_SURFACE_OBJECT_TYPES = {
     'sack', 'towel', 'tabletop', 'face', 'brim', 'cheddar', 'chaise_longue',
