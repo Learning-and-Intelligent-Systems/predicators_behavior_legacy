@@ -34,6 +34,7 @@ To run grammar search predicate invention (example):
         --seed 0 --excluded_predicates all
 """
 
+import cProfile
 import logging
 import os
 import sys
@@ -422,4 +423,4 @@ def _save_test_results(results: Metrics,
 
 
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    cProfile.run('main()', 'profs/prof__' + CFG.behavior_task_name + "__" + CFG.behavior_scene_name)

@@ -444,6 +444,7 @@ class BehaviorEnv(BaseEnv):
             # Name is extended with sub-type in some behavior tasks
             if self._ig_object_name(ig_obj).startswith(name):
                 return ig_obj
+        import ipdb; ipdb.set_trace()
         raise ValueError(f"No IG object found for name {name}.")
 
     @functools.lru_cache(maxsize=None)
@@ -555,7 +556,15 @@ class BehaviorEnv(BaseEnv):
     def _get_grasped_objects(self, state: State) -> Set[Object]:
         grasped_objs = set()
         for obj in state:
-            ig_obj = self.object_to_ig_object(obj)
+            # Sometimes we grasp an object not in task relevent objects.
+            # If obj not in task relevant objects skip object.
+            obj_found = False
+            for ig_obj in self._get_task_relevant_objects():
+                # Name is extended with sub-type in some behavior tasks
+                if self._ig_object_name(ig_obj).startswith(obj.name):
+                    obj_found = True
+            if obj_found == False:
+                continue
 
             # NOTE: The below block is necessary because somehow the body_id
             # is sometimes a 1-element list...
