@@ -8,6 +8,8 @@ import pandas as pd
 from scripts.analyze_results_directory import combine_selectors, \
     create_dataframes, get_df_for_entry, pd_create_equal_selector
 
+pd.set_option('chained_assignment', None)
+
 ############################ Change below here ################################
 
 # Groups over which to take mean/std.
