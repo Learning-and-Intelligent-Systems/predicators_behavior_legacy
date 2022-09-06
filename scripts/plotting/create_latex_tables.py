@@ -9,7 +9,7 @@ from scripts.analyze_results_directory import combine_selectors, \
     create_dataframes, get_df_for_entry, pd_create_equal_selector
 
 # pd.options.mode.chained_assignment = None  # default='warn'
-pd.set_option('chained_assignment',None)
+pd.set_option('chained_assignment', None)
 
 ############################ Change below here ################################
 
