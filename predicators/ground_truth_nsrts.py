@@ -2959,7 +2959,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
         split_name = option.name.split("-")
         base_option_name = split_name[0]
         option_arg_type_names = split_name[1:]
-        # Edge case t-shirt gets parsed wrong with split("")
+        # Edge case t-shirt gets parsed wrong with split("").
         if option_arg_type_names[0] == "t" and option_arg_type_names[
                 1] == "shirt":
             option_arg_type_names = ["t-shirt"] + option_arg_type_names[2:]
@@ -3022,7 +3022,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                 add_effects = {targ_holding}
                 delete_effects_ontop = {handempty, ontop, targ_reachable}
                 delete_effects_inside = {handempty, inside, targ_reachable}
-                # NSRT for grasping an object from ontop an object
+                # NSRT for grasping an object from ontop an object.
                 nsrt = NSRT(
                     f"{option.name}-{next(op_name_count_pick)}",
                     parameters,
@@ -3035,7 +3035,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     grasp_obj_param_sampler,
                 )
                 nsrts.add(nsrt)
-                # NSRT for grasping an object from inside an object
+                # NSRT for grasping an object from inside an object.
                 nsrt = NSRT(
                     f"{option.name}-{next(op_name_count_pick)}",
                     parameters,

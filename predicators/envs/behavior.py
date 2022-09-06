@@ -235,8 +235,8 @@ class BehaviorEnv(BaseEnv):
         # Currently assumes that the goal is a single AND of
         # ground atoms (this is also assumed by the planner).
         goal = set()
-        # assert len(
-        #     self.igibson_behavior_env.task.ground_goal_state_options) == 1
+        assert len(
+            self.igibson_behavior_env.task.ground_goal_state_options) == 1
         for head_expr in self.igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             # BDDL expresses negative goals (such as 'not open').
@@ -251,7 +251,7 @@ class BehaviorEnv(BaseEnv):
             else:
                 bddl_name = head_expr.terms[0]  # untyped
                 obj_start_idx = 1
-            # For onfloor we will just use ontop of floor
+            # For onfloor we will just use ontop of floor.
             if bddl_name == 'onfloor':
                 bddl_name = 'ontop'
             ig_objs = [
