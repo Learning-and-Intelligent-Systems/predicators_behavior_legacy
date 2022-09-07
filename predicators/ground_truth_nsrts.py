@@ -3008,7 +3008,8 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             for surf_obj_type in sorted(env.types):
                 # If the surface object is not in these object types, we do not
                 # have to make a NSRT with this type.
-                if surf_obj_type.name not in PLACE_ONTOP_SURFACE_OBJECT_TYPES | PLACE_INTO_SURFACE_OBJECT_TYPES:
+                if surf_obj_type.name not in PLACE_ONTOP_SURFACE_OBJECT_TYPES\
+                    | PLACE_INTO_SURFACE_OBJECT_TYPES:
                     continue
                 surf_obj = Variable("?surf", surf_obj_type)
                 parameters = [target_obj, surf_obj]
