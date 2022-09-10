@@ -227,6 +227,11 @@ class BehaviorEnv(BaseEnv):
                         f"{CFG.seed}__{self.task_num}__" +
                         f"{self.task_instance_id}",
                         exist_ok=True)
+            # NOTE: We load_checkpoint_state here because there appears to
+            # be a subtle difference between calling the predicate classifiers
+            # on a particular state, and calling them after loading checkpoint
+            # on that particular state. Doing this resolves that discrepancy.
+            load_checkpoint_state(self.current_ig_state_to_state(), self)
             init_state = self.current_ig_state_to_state()
             goal = self._get_task_goal()
             task = Task(init_state, goal)
@@ -697,11 +702,14 @@ def make_behavior_option(
         assert len(igo) == 1
 
         # Load the checkpoint associated with state.simulator_state
-        # to make sure that we run RRT from the intended state.
+        # to make sure that we run low-level planning from the intended
+        # state.
+        # if not state.allclose(
+        #             env.current_ig_state_to_state(save_state=False)):
         load_checkpoint_state(state, env)
 
         if memory.get("planner_result") is not None:
-            # In this case, an rrt_plan has already been found for this
+            # In this case, a low-level plan has already been found for this
             # option (most likely, this will occur when executing a
             # series of options after having planned).
             return True
