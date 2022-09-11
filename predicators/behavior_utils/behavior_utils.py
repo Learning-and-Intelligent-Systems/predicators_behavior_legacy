@@ -31,7 +31,8 @@ ALL_RELEVANT_OBJECT_TYPES = {
     'coffee_table', 'pop', 'bed', 'bucket', 'plate', 'hamburger', 'countertop',
     'trash_can', 'backpack', 'toothbrush', 'shampoo', 'underwear', 'door',
     'window', 'toothpaste', 'package', 'highlighter', 'swivel_chair',
-    'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet', 'top_cabinet'
+    'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet',
+    'top_cabinet'
 }
 PICK_PLACE_OBJECT_TYPES = {
     'mineral_water', 'oatmeal', 'blueberry', 'headset', 'jug', 'flank',

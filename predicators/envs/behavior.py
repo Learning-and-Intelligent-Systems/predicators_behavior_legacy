@@ -37,8 +37,8 @@ except (ImportError, ModuleNotFoundError) as e:
 from gym.spaces import Box
 
 from predicators import utils
-from predicators.behavior_utils.behavior_utils import ALL_RELEVANT_OBJECT_TYPES, \
-    load_checkpoint_state
+from predicators.behavior_utils.behavior_utils import \
+    ALL_RELEVANT_OBJECT_TYPES, load_checkpoint_state
 from predicators.behavior_utils.motion_planner_fns import make_dummy_plan, \
     make_grasp_plan, make_navigation_plan, make_place_plan
 from predicators.behavior_utils.option_fns import create_dummy_policy, \
@@ -244,11 +244,8 @@ class BehaviorEnv(BaseEnv):
         # Currently assumes that the goal is a single AND of
         # ground atoms (this is also assumed by the planner).
         goal = set()
-        try:
-            assert len(
-                self.igibson_behavior_env.task.ground_goal_state_options) == 1
-        except AssertionError:
-            import ipdb; ipdb.set_trace()
+        assert len(
+            self.igibson_behavior_env.task.ground_goal_state_options) == 1
         for head_expr in self.igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             # BDDL expresses negative goals (such as 'not open').
@@ -341,9 +338,16 @@ class BehaviorEnv(BaseEnv):
 
     @property
     def types(self) -> Set[Type]:
-        for ig_obj in self._get_task_relevant_objects():
-        # for type_name in ALL_RELEVANT_OBJECT_TYPES:
-            type_name = ig_obj.category
+        # NOTE: The commented out for-loop line and the type_name line
+        # below are what we used to do before defining
+        # ALL_RELEVANT_OBJECT_TYPES. They are useful to comment back in
+        # when we want to debug a task by looking at the NSRTs (since
+        # putting these back in and commenting out the current for loop
+        # line will create only task-relevant typed NSRTs and not all
+        # NSRTs for all relevant object types).
+        # for ig_obj in self._get_task_relevant_objects():
+        for type_name in ALL_RELEVANT_OBJECT_TYPES:
+            # type_name = ig_obj.category
             if type_name in self._type_name_to_type:
                 continue
             # In the future, we may need other object attributes,
@@ -356,12 +360,6 @@ class BehaviorEnv(BaseEnv):
                 ],
             )
             self._type_name_to_type[type_name] = obj_type
-
-        # for t in self._type_name_to_type.values():
-        #     if t.name == "notebook":
-        #         import ipdb; ipdb.set_trace()
-
-        # import ipdb; ipdb.set_trace()
 
         return set(self._type_name_to_type.values())
 
@@ -446,13 +444,17 @@ class BehaviorEnv(BaseEnv):
     # lead to wrong mappings when we load a different scene
     def _ig_object_to_object(self, ig_obj: "ArticulatedObject") -> Object:
         type_name = ig_obj.category
-        try:
-            obj_type = self._type_name_to_type[type_name]
-        except KeyError:
-            for ig_obj in self._get_task_relevant_objects():
-                if ig_obj.category not in ALL_RELEVANT_OBJECT_TYPES:
-                    print(ig_obj.category)
-            import ipdb; ipdb.set_trace()
+        # NOTE: Since we don't necessarily have the full set of
+        # types we might need to solve a new domain, it is often
+        # useful to uncomment the below try-except block to
+        # print out types that need to be added to ALL_RELEVANT_OBJECT_TYPES.
+        # try:
+        obj_type = self._type_name_to_type[type_name]
+        # except KeyError:
+        #     for ig_obj in self._get_task_relevant_objects():
+        #         if ig_obj.category not in ALL_RELEVANT_OBJECT_TYPES:
+        #             print(ig_obj.category)
+        #     import ipdb; ipdb.set_trace()
         ig_obj_name = self._ig_object_name(ig_obj)
         return Object(ig_obj_name, obj_type)
 
