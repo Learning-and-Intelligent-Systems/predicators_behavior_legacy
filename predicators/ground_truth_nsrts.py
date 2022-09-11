@@ -2871,7 +2871,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             state: State, goal: Set[GroundAtom], rng: Generator,
             objects: Union["URDFObject", "RoomFloor"]) -> Array:
         """Sampler for placeOnTop option."""
-        # del state, goal
+        del goal
         assert rng is not None
         # objA is the object the robot is currently holding, and
         # objB is the surface that it must place onto.
@@ -2930,21 +2930,21 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                         rng.uniform(-objB_sampling_bounds[2] + 0.3,
                                     objB_sampling_bounds[1]) + 0.3
                     ])
-                    # NOTE: In many situations, it is impossible to find a good sample
-                    # no matter how many times we try. Thus, we break this loop after
-                    # a certain number of tries so the planner will backtrack.
+                    # NOTE: In many situations, it is impossible to find a
+                    # good sample no matter how many times we try. Thus, we
+                    # break this loop after a certain number of tries so the
+                    # planner will backtrack.
                     if num_samples_tried > MAX_PLACEONTOP_SAMPLES:
                         break
                     num_samples_tried += 1
                 return sample_params
-            else:
-                # If there's no object specific sampler, just return a
-                # random sample.
-                return np.array([
-                    rng.uniform(-0.5, 0.5),
-                    rng.uniform(-0.5, 0.5),
-                    rng.uniform(0.3, 1.0)
-                ])
+            # If there's no object specific sampler, just return a
+            # random sample.
+            return np.array([
+                rng.uniform(-0.5, 0.5),
+                rng.uniform(-0.5, 0.5),
+                rng.uniform(0.3, 1.0)
+            ])
 
         rnd_params = np.subtract(sampling_results[0][0], objB.get_position())
         return rnd_params
