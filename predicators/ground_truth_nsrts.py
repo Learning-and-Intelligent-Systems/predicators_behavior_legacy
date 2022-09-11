@@ -2884,7 +2884,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
             "max_angle_with_z_axis": 0.17,
             "bimodal_stdev_fraction": 1e-6,
             "bimodal_mean_fraction": 1.0,
-            "max_sampling_attempts": 500,
+            "max_sampling_attempts": 50,
             "aabb_offset": 0.01,
         }
         aabb = get_aabb(objA.get_body_id())
