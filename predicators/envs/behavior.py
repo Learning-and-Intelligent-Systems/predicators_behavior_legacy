@@ -706,8 +706,6 @@ def make_behavior_option(
         # Load the checkpoint associated with state.simulator_state
         # to make sure that we run low-level planning from the intended
         # state.
-        # if not state.allclose(
-        #             env.current_ig_state_to_state(save_state=False)):
         load_checkpoint_state(state, env)
 
         if memory.get("planner_result") is not None:
