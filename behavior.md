@@ -1,10 +1,41 @@
 # Running BEHAVIOR Experiments
 
 ## Installation
-This repository and some of the functionality it enables are integrated with the [BEHAVIOR benchmark of tasks](https://behavior.stanford.edu/benchmark-guide) simulated with the [iGibson simulator](https://github.com/StanfordVL/iGibson). To install iGibson with BEHAVIOR, follow [**Option 1** from these instructions](https://stanfordvl.github.io/behavior/installation.html). However, note that you need to use our forks of the [iGibson](https://github.com/Learning-and-Intelligent-Systems/iGibson) and [bddl](https://github.com/Learning-and-Intelligent-Systems/bddl) repositories. Thus, instead of steps 2a. and 2b. of Option 1 in the linked instructions, run:
+This repository is integrated with the [BEHAVIOR benchmark of tasks](https://behavior.stanford.edu/benchmark-guide) simulated with the [iGibson simulator](https://github.com/StanfordVL/iGibson). To install iGibson with BEHAVIOR, follow the below steps:
+
+1. Make sure you have all the prerequisites for iGibson installation. These are listed [here](https://stanfordvl.github.io/iGibson/installation.html#installing-dependencies).
+1. Install this (`predicators_behavior`) repository as described in [the README](https://github.com/Learning-and-Intelligent-Systems/predicators_behavior#installation).
+    1. Preferably, do this in a new virtual or conda environment!
+1. Clone the necessary repositories to run BEHAVIOR:
+    1. Our fork of the iGibson simulation environment:
+        ```
+        git clone https://github.com/Learning-and-Intelligent-Systems/iGibson.git --recursive
+        ```
+    1. Our fork of the BDDL repository, which contains all the task definitions:
+        ```
+        git clone https://github.com/Learning-and-Intelligent-Systems/bddl.git
+        ```
+1. Download and obtain access to the BEHAVIOR Dataset of Objects (3D assets with physical and semantic annotations) 
+    1. Accept the license agreement filling the [form](https://forms.gle/GXAacjpnotKkM2An7). This allows you to use the assets within iGibson for free for your research.    
+    1. You will receive a encryption key (`igibson.key`). Move the key into the data folder of the iGibson repository, `iGibson/igibson/data`.    
+    1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes from [form](https://forms.gle/GXAacjpnotKkM2An7).
+    1. Decompress the BEHAVIOR data bundle and move it into the `iGibson/igibson/data` folder:
+        ```
+        unzip behavior_data_bundle.zip -d iGibson/igibson/data
+        ```
+1. Within a virtual environment (preferably, the one you created to install this overall repository), install the downloaded repositories:
+    ```
+    pip install -e ./iGibson
+    pip install -e ./bddl
+    ```
+1. Download the iGibson assets that include robot models
+    ```
+    python -m igibson.utils.assets_utils --download_assets
+    ```
+
+That's it! You can verify installation by running a simple command such as:
 ```
-git clone https://github.com/Learning-and-Intelligent-Systems/iGibson.git --recursive
-git clone https://github.com/Learning-and-Intelligent-Systems/bddl.git
+python predicators/main.py --env behavior --approach oracle --behavior_mode simple --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Rs_int --behavior_task_name locking_every_window --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True
 ```
 
 ## Running Experiments
@@ -13,6 +44,6 @@ git clone https://github.com/Learning-and-Intelligent-Systems/bddl.git
 * Set `--option_model_name oracle_behavior` to use the behavior option model and speed up planning by a significant factor.
 * Set `--behavior_task_name` to the name of the particular bddl task you'd like to run (e.g. `re-shelving_library_books`).
 * Set `--behavior_scene_name` to the name of the house setting (e.g. `Pomaria_1_int`) you want to try running the particular task in. Note that not all tasks are available in all houses (e.g. `re-shelving_library_books` might only be available with `Pomaria_1_int`).
-* `--behavior_randomize_init_state` can be set to True if you want to generate multiple different initial states that correspond to the BDDL init conditions of a particular task.
 * If you'd like to see a visual of the agent planning in iGibson, set the command line argument `--behavior_mode simple`. If you want to run in headless mode without any visuals, leave the default (i.e `--behavior_mode headless`).
-* Example command: `python predicators/main.py --env behavior --approach oracle --seed 0 --timeout 1000 --sesame_max_samples_per_step 20 --behavior_mode simple --option_model_name oracle_behavior --num_train_tasks 2 --num_test_tasks 2 --behavior_randomize_init_state True --behavior_scene_name Pomaria_1_int --behavior_task_name re-shelving_library_books`.
+* Be sure to set `--plan_only_eval True`: this is necessary to account for the fact that the iGibson simulator is non-deterministic when saving and loading states (which is currently an unresolved bug).
+* Example command: `python predicators/main.py --env behavior --approach oracle --behavior_mode simple --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Rs_int --behavior_task_name locking_every_window --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True`.
