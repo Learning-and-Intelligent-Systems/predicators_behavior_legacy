@@ -1,7 +1,7 @@
 # Running BEHAVIOR Experiments
 
 ## Installation
-This repository is integrated with the [BEHAVIOR benchmark of tasks](https://behavior.stanford.edu/benchmark-guide) simulated with the [iGibson simulator](https://github.com/StanfordVL/iGibson). To install iGibson with BEHAVIOR, follow the below steps:
+This repository is integrated with the [BEHAVIOR benchmark of tasks](https://behavior.stanford.edu/benchmark-guide) simulated with the [iGibson simulator](https://github.com/StanfordVL/iGibson). To install iGibson with BEHAVIOR, follow the below steps (NOTE: if you're on a Mac, [these instructions here](https://github.com/Learning-and-Intelligent-Systems/iGibson/blob/master/mac_behavior_installation.md) might be helpful to reference as well):
 
 1. Make sure you have all the prerequisites for iGibson installation. These are listed [here](https://stanfordvl.github.io/iGibson/installation.html#installing-dependencies).
 1. Install this (`predicators_behavior`) repository as described in [the README](https://github.com/Learning-and-Intelligent-Systems/predicators_behavior#installation).
