@@ -69,7 +69,9 @@ class BehaviorEnv(BaseEnv):
                                                       List[str]] = json.load(f)
         # behavior_randomize_init_state will always be False in this
         # config_file because we are not using their scene samplers.
-        # We are loading pre-computed scenes.
+        # We are loading pre-computed scenes. Below we load either the
+        # pre-computed scene given by behavior_scene_name or randomly
+        # select a valid pre-computed scene.
         if len(CFG.behavior_task_list) != 0:
             assert CFG.behavior_scene_name == "all"
             rng = np.random.default_rng(0)
