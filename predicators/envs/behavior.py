@@ -174,16 +174,17 @@ class BehaviorEnv(BaseEnv):
                 )
                 self._options.add(option)
 
-    def set_config_by_index(self, task_index: int) -> None:
+    def set_config_by_task_num(self, task_num: int) -> None:
         """A method that changes BEHAVIORs config_file.
 
         Necessary when loading in an environment with different task or scene,
         which is used when running our BEHAVIOR all environments option.
         Note: This requires a behavior_task_list of tasks.
         """
+        task_index = self.task_list_indices[task_num]
         self._config_file = modify_config_file(
             os.path.join(igibson.root_path, CFG.behavior_config_file),
-            CFG.behavior_task_list[task_index], self.scene_list[task_index],
+            CFG.behavior_task_list[task_index], self.scene_list[task_num],
             False)
 
     def get_random_scene_for_task(self, behavior_task_name: str,
@@ -262,8 +263,7 @@ class BehaviorEnv(BaseEnv):
                 else:
                     self.task_instance_id = rng.integers(0, 10)
                 if CFG.behavior_task_name == "all":
-                    self.set_config_by_index(
-                        self.task_list_indices[self.task_num])
+                    self.set_config_by_task_num(self.task_num)
                 self.set_igibson_behavior_env(
                     task_num=self.task_num,
                     task_instance_id=self.task_instance_id,
@@ -470,7 +470,7 @@ class BehaviorEnv(BaseEnv):
         # ig_objs_bddl_scope doesn't contain any None's
         while True:
             if CFG.behavior_task_name == "all":
-                self.set_config_by_index(self.task_list_indices[task_num])
+                self.set_config_by_task_num(task_num)
             self.igibson_behavior_env = behavior_env.BehaviorEnv(
                 config_file=self._config_file,
                 mode=CFG.behavior_mode,
