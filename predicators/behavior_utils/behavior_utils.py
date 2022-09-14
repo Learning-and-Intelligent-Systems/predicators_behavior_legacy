@@ -477,6 +477,7 @@ def load_checkpoint_state(s: State,
         # we reset the env.
         frame_count = env.igibson_behavior_env.simulator.frame_count
         env.set_igibson_behavior_env(
+            task_num=env.task_num,
             task_instance_id=new_task_num_task_instance_id[1],
             seed=env.task_num_task_instance_id_to_igibson_seed[
                 new_task_num_task_instance_id])
