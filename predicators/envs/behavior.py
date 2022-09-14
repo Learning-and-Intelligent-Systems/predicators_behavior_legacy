@@ -61,7 +61,7 @@ class BehaviorEnv(BaseEnv):
         if not _BEHAVIOR_IMPORTED:
             raise ModuleNotFoundError("BEHAVIOR is not installed.")
         # Loads dictionary mapping tasks to vaild scenes in BEHAVIOR.
-        if len(CFG.behavior_task_list) != 0:
+        if len(CFG.behavior_task_list) != 1:
             path_to_file = \
                 "predicators/behavior_utils/task_to_preselected_scenes.json"
             with open(path_to_file, 'rb') as f:
@@ -72,7 +72,7 @@ class BehaviorEnv(BaseEnv):
         # We are loading pre-computed scenes. Below we load either the
         # pre-computed scene given by behavior_scene_name or randomly
         # select a valid pre-computed scene.
-        if len(CFG.behavior_task_list) != 0:
+        if len(CFG.behavior_task_list) != 1:
             assert CFG.behavior_scene_name == "all"
             rng = np.random.default_rng(0)
             self._config_file = modify_config_file(
@@ -89,7 +89,7 @@ class BehaviorEnv(BaseEnv):
         self._rng = np.random.default_rng(self._seed)
         self.task_num = 0  # unique id to differentiate tasks
         self.task_instance_id = 0  # id used for scene
-        if len(CFG.behavior_task_list) != 0:
+        if len(CFG.behavior_task_list) != 1:
             self.task_list_indices = [
                 int(self._rng.integers(0, len(CFG.behavior_task_list)))
                 for _ in range(CFG.num_train_tasks + CFG.num_test_tasks)
@@ -264,7 +264,7 @@ class BehaviorEnv(BaseEnv):
                     self.task_instance_id = rng.integers(10, 20)
                 else:
                     self.task_instance_id = rng.integers(0, 10)
-                if len(CFG.behavior_task_list) != 0:
+                if len(CFG.behavior_task_list) != 1:
                     self.set_config_by_task_num(self.task_num)
                 self.set_igibson_behavior_env(
                     task_num=self.task_num,
@@ -473,7 +473,7 @@ class BehaviorEnv(BaseEnv):
         # iGibson env may fail and we need to keep trying until
         # ig_objs_bddl_scope doesn't contain any None's
         while True:
-            if len(CFG.behavior_task_list) != 0:
+            if len(CFG.behavior_task_list) != 1:
                 self.set_config_by_task_num(task_num)
             self.igibson_behavior_env = behavior_env.BehaviorEnv(
                 config_file=self._config_file,
