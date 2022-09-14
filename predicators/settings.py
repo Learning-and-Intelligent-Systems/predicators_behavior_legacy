@@ -115,12 +115,11 @@ class GlobalSettings:
     behavior_mode = "headless"  # headless, pbgui, iggui
     behavior_action_timestep = 1.0 / 10.0
     behavior_physics_timestep = 1.0 / 120.0
-    behavior_task_name = "re-shelving_library_books"
+    behavior_task_list = ["re-shelving_library_books"]
     behavior_scene_name = "Pomaria_1_int"
     behavior_randomize_init_state = True
     behavior_option_model_eval = False
     behavior_option_model_rrt = False
-    behavior_task_list = None
 
     # general pybullet parameters
     pybullet_use_gui = False  # must be True to make videos

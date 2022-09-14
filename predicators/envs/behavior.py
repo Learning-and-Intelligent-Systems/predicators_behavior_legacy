@@ -61,7 +61,7 @@ class BehaviorEnv(BaseEnv):
         if not _BEHAVIOR_IMPORTED:
             raise ModuleNotFoundError("BEHAVIOR is not installed.")
         # Loads dictionary mapping tasks to vaild scenes in BEHAVIOR.
-        if CFG.behavior_task_name == "all":
+        if len(CFG.behavior_task_list) != 0:
             path_to_file = \
                 "predicators/behavior_utils/task_to_preselected_scenes.json"
             with open(path_to_file, 'rb') as f:
@@ -70,7 +70,7 @@ class BehaviorEnv(BaseEnv):
         # behavior_randomize_init_state will always be False in this
         # config_file because we are not using their scene samplers.
         # We are loading pre-computed scenes.
-        if CFG.behavior_task_name == "all":
+        if len(CFG.behavior_task_list) != 0:
             assert CFG.behavior_scene_name == "all"
             rng = np.random.default_rng(0)
             self._config_file = modify_config_file(
@@ -81,13 +81,13 @@ class BehaviorEnv(BaseEnv):
         else:
             self._config_file = modify_config_file(
                 os.path.join(igibson.root_path, CFG.behavior_config_file),
-                CFG.behavior_task_name, CFG.behavior_scene_name, False)
+                CFG.behavior_task_list[0], CFG.behavior_scene_name, False)
 
         super().__init__()  # To ensure self._seed is defined.
         self._rng = np.random.default_rng(self._seed)
         self.task_num = 0  # unique id to differentiate tasks
         self.task_instance_id = 0  # id used for scene
-        if CFG.behavior_task_name == "all":
+        if len(CFG.behavior_task_list) != 0:
             self.task_list_indices = [
                 int(self._rng.integers(0, len(CFG.behavior_task_list)))
                 for _ in range(CFG.num_train_tasks + CFG.num_test_tasks)
@@ -262,7 +262,7 @@ class BehaviorEnv(BaseEnv):
                     self.task_instance_id = rng.integers(10, 20)
                 else:
                     self.task_instance_id = rng.integers(0, 10)
-                if CFG.behavior_task_name == "all":
+                if len(CFG.behavior_task_list) != 0:
                     self.set_config_by_task_num(self.task_num)
                 self.set_igibson_behavior_env(
                     task_num=self.task_num,
@@ -272,8 +272,10 @@ class BehaviorEnv(BaseEnv):
             self.igibson_behavior_env.reset()
             self.task_num_task_instance_id_to_igibson_seed[(
                 self.task_num, self.task_instance_id)] = curr_env_seed
+            behavior_task_name = CFG.behavior_task_list[0] if len(
+                CFG.behavior_task_list) == 1 else "all"
             os.makedirs(f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
-                        f"{CFG.behavior_task_name}__{CFG.num_train_tasks}__" +
+                        f"{behavior_task_name}__{CFG.num_train_tasks}__" +
                         f"{CFG.seed}__{self.task_num}__" +
                         f"{self.task_instance_id}",
                         exist_ok=True)
@@ -469,7 +471,7 @@ class BehaviorEnv(BaseEnv):
         # iGibson env may fail and we need to keep trying until
         # ig_objs_bddl_scope doesn't contain any None's
         while True:
-            if CFG.behavior_task_name == "all":
+            if len(CFG.behavior_task_list) != 0:
                 self.set_config_by_task_num(task_num)
             self.igibson_behavior_env = behavior_env.BehaviorEnv(
                 config_file=self._config_file,
@@ -556,10 +558,12 @@ class BehaviorEnv(BaseEnv):
         # save_state was set to False!
         simulator_state = None
         if save_state:
+            behavior_task_name = CFG.behavior_task_list[0] if len(
+                CFG.behavior_task_list) == 1 else "all"
             simulator_state = save_checkpoint(
                 self.igibson_behavior_env.simulator,
                 f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
-                f"{CFG.behavior_task_name}__{CFG.num_train_tasks}__" +
+                f"{behavior_task_name}__{CFG.num_train_tasks}__" +
                 f"{CFG.seed}__{self.task_num}__" + f"{self.task_instance_id}/")
         return utils.BehaviorState(
             state_data,
