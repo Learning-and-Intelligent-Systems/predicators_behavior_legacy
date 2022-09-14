@@ -61,12 +61,12 @@ class BehaviorEnv(BaseEnv):
         if not _BEHAVIOR_IMPORTED:
             raise ModuleNotFoundError("BEHAVIOR is not installed.")
         # Loads dictionary mapping tasks to vaild scenes in BEHAVIOR.
-        self.task_to_preselected_scenes = None
         if CFG.behavior_task_name == "all":
             path_to_file = \
                 "predicators/behavior_utils/task_to_preselected_scenes.json"
             with open(path_to_file, 'rb') as f:
-                self.task_to_preselected_scenes = json.load(f)
+                self.task_to_preselected_scenes: Dict[str,
+                                                      List[str]] = json.load(f)
         # behavior_randomize_init_state will always be False in this
         # config_file because we are not using their scene samplers.
         # We are loading pre-computed scenes.
@@ -87,12 +87,11 @@ class BehaviorEnv(BaseEnv):
         self._rng = np.random.default_rng(self._seed)
         self.task_num = 0  # unique id to differentiate tasks
         self.task_instance_id = 0  # id used for scene
-        self.task_list_indices = None
         if CFG.behavior_task_name == "all":
-            self.task_list_indices = self._rng.integers(
-                0,
-                len(CFG.behavior_task_list),
-                size=CFG.num_train_tasks + CFG.num_test_tasks)
+            self.task_list_indices = [
+                int(self._rng.integers(0, len(CFG.behavior_task_list)))
+                for _ in range(CFG.num_train_tasks + CFG.num_test_tasks)
+            ]
             self.scene_list = [
                 self.get_random_scene_for_task(CFG.behavior_task_list[i],
                                                self._rng)
