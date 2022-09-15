@@ -23,6 +23,7 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
         ```
         unzip behavior_data_bundle.zip -d iGibson/igibson/data
         ```
+1. Make sure there is no version of `pybullet` currently installed in your virtual environment (if there is, it will create problems for the next step). You can do this with `pip uninstall pybullet`.
 1. Within a virtual environment (preferably, the one you created to install this overall repository), install the downloaded repositories:
     ```
     pip install -e ./iGibson
