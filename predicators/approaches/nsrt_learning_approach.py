@@ -22,6 +22,7 @@ from predicators.behavior_utils import behavior_utils
 from predicators.envs import get_or_create_env
 from predicators.envs.behavior import BehaviorEnv
 from predicators.nsrt_learning.nsrt_learning_main import learn_nsrts_from_data
+from predicators.nsrt_learning.sampler_learning import _LearnedSampler
 from predicators.planning import task_plan, task_plan_grounding
 from predicators.settings import CFG
 from predicators.structs import NSRT, Dataset, GroundAtom, LiftedAtom, \
@@ -164,15 +165,18 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                                   ground_atom_dataset,
                                   sampler_learner=CFG.sampler_learner)
         save_path = utils.get_approach_save_path_str()
+        # Need to save samplers if we are dumping to string
+        if CFG.dump_nsrts_as_strings:
+            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs", "wb") as f:
+                sampler_name_to_sampler = {}
+                for nsrt in self._nsrts:
+                    sampler = nsrt.sampler.__self__
+                    sampler_name_to_sampler[nsrt.name] = _LearnedSampler(sampler._classifier, sampler._regressor, sampler._variables, None)
+                pkl.dump(sampler_name_to_sampler, f)
+
         with open(f"{save_path}_{online_learning_cycle}.NSRTs", "wb") as f:
             if CFG.dump_nsrts_as_strings:
                 pkl.dump(str(self._nsrts), f)
-                savefile = open("sampler.SAMPLERs","wb")
-                sampler_name_to_sampler = {}
-                for nsrt in self._nsrts:
-                    sampler_name_to_sampler[nsrt.name] = nsrt.sampler
-                    pkl.dump(sampler_name_to_sampler, savefile)
-                savefile.close()
             else:
                 pkl.dump(self._nsrts, f)
         if CFG.compute_sidelining_objective_value:
@@ -184,8 +188,10 @@ class NSRTLearningApproach(BilevelPlanningApproach):
             self._nsrts = pkl.load(f)
         if CFG.env == "behavior":
             assert isinstance(self._nsrts, str)
+            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs", "rb") as f:
+                sampler_name_to_sampler = pkl.load(f)
             # Implement string_nsrts to _nsrts
-            self._nsrts = self.parse_nsrts_string(self._nsrts)
+            self._nsrts = self.parse_nsrts_string(self._nsrts, sampler_name_to_sampler)
         if CFG.pretty_print_when_loading:
             preds, _ = utils.extract_preds_and_types(self._nsrts)
             name_map = {}
@@ -269,7 +275,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                      f"complexity {complexity}")
 
 
-    def parse_nsrts_string(self, nsrts_string: str) -> Set[NSRT]:
+    def parse_nsrts_string(self, nsrts_string: str, sampler_name_to_sampler: Dict[str, _LearnedSampler]) -> Set[NSRT]:
         assert CFG.env == "behavior"
         nsrts = set()
         type_name_to_type = self._get_from_env_by_names_dict(CFG.env, "types")
@@ -278,7 +284,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
 
         for nsrt_string in nsrts_string.replace("{","").replace("}","").split("NSRT-")[1:]:
             name, params, precond, add_effects, delete_effects, ignore_effects, option_spec = nsrt_string.split("\n    ")
-            name = "NSRT-" + name.replace(":","")
+            name = name.replace(":","")
             params = [param.split(":") for param in re.findall(r"\[(.*?)\]", params)[0].split(", ")]
             add_effects = re.findall(r"\[(.*?)\]", add_effects)[0].split(", ")
             precond = re.findall(r"\[(.*?)\]", precond)[0].split(", ")
@@ -295,10 +301,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                     return predicates
                 for unparsed_pred in unparsed_preds:
                     pred_name = unparsed_pred.split("(")[0]
-                    try:
-                        pred_vars = [pred_var.split(":") for pred_var in re.findall(r"\((.*?)\)", unparsed_pred)[0].split(", ")]
-                    except:
-                        import ipdb; ipdb.set_trace()
+                    pred_vars = [pred_var.split(":") for pred_var in re.findall(r"\((.*?)\)", unparsed_pred)[0].split(", ")]
                     if pred_vars[0] == [""]:
                         args = []
                     else:
@@ -317,8 +320,11 @@ class NSRTLearningApproach(BilevelPlanningApproach):
             nsrt_option = option_name_to_option[option_spec.split("(")[0]]
             option_vars = [option_var.split(":") for option_var in re.findall(r"\((.*?)\)", option_spec)[0].split(", ")]
             nsrt_option_vars = [Variable(option_var[0], type_name_to_type[option_var[1]]) for option_var in option_vars]
-            
+            # Sampler
+            sampler = sampler_name_to_sampler[name]
+            nsrt_sampler = _LearnedSampler(sampler._classifier, sampler._regressor, sampler._variables, nsrt_option).sampler
+
             nsrts.add(NSRT(name, nsrt_parameters, nsrt_precond,
                         nsrt_add_effects, nsrt_delete_effects, nsrt_ignore_effects,
-                        nsrt_option, nsrt_option_vars, utils.null_sampler))
+                        nsrt_option, nsrt_option_vars, nsrt_sampler))
         return nsrts
