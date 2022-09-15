@@ -4,7 +4,8 @@ import json
 import os
 import shutil
 
-NUM_TEST = 10
+NUM_TRAIN = 10
+NUM_TEST = 5
 SEED = 0
 TIMEOUT = 500
 OPEN_PICK_PLACE_TASKS = [
@@ -53,18 +54,23 @@ def _run_behavior_pickplaceopen_tests() -> None:
 
                 cmds.append("python predicators/main.py "
                             "--env behavior "
-                            "--approach oracle "
+                            "--approach nsrt_learning "
                             "--behavior_mode headless "
                             "--option_model_name oracle_behavior "
-                            "--num_train_tasks 1 "
+                            f"--num_train_tasks {NUM_TRAIN} "
                             f"--num_test_tasks {NUM_TEST} "
                             f"--behavior_scene_name {scene} "
                             f"--behavior_task_list \"[{task}]\" "
+                            "--sampler_learner neural "
+                            "--strips_learner backchaining "
                             f"--seed {SEED} "
                             f"--offline_data_planning_timeout {TIMEOUT} "
                             f"--timeout {TIMEOUT} "
                             "--behavior_option_model_eval True "
                             "--plan_only_eval True "
+                            "--sesame_task_planner fdopt "
+                            "--data_orderings_to_search 5 "
+                            "--enable_harmless_op_pruning True "
                             f"--results_dir {logfolder}")
 
     # Run the commands in order.
