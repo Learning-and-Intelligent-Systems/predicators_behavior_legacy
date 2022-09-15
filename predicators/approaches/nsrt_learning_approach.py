@@ -10,9 +10,9 @@ import re
 import time
 from typing import Dict, List, Optional, Set
 
-from pytest import param
 import dill as pkl
 from gym.spaces import Box
+from pytest import param
 
 from predicators import utils
 from predicators.approaches.bilevel_planning_approach import \
@@ -25,7 +25,8 @@ from predicators.nsrt_learning.sampler_learning import _LearnedSampler
 from predicators.planning import task_plan, task_plan_grounding
 from predicators.settings import CFG
 from predicators.structs import NSRT, Dataset, GroundAtom, LiftedAtom, \
-    LowLevelTrajectory, ParameterizedOption, Predicate, Segment, Sequence, Task, Type, Variable
+    LowLevelTrajectory, ParameterizedOption, Predicate, Segment, Sequence, \
+    Task, Type, Variable
 
 
 class NSRTLearningApproach(BilevelPlanningApproach):
@@ -51,8 +52,10 @@ class NSRTLearningApproach(BilevelPlanningApproach):
     def _get_current_nsrts(self) -> Set[NSRT]:
         return self._nsrts
 
-    def _get_from_env_by_names_dict(self, env_name: str, env_attr: str) -> List:
-        """Helper for getting dict to load types, predicates, and options by name."""
+    def _get_from_env_by_names_dict(self, env_name: str,
+                                    env_attr: str) -> List:
+        """Helper for getting dict to load types, predicates, and options by
+        name."""
         env = get_or_create_env(env_name)
         name_to_env_obj = {}
         for o in getattr(env, env_attr):
@@ -166,11 +169,14 @@ class NSRTLearningApproach(BilevelPlanningApproach):
         save_path = utils.get_approach_save_path_str()
         # Need to save samplers if we are dumping to string
         if CFG.dump_nsrts_as_strings:
-            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs", "wb") as f:
+            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs",
+                      "wb") as f:
                 sampler_name_to_sampler = {}
                 for nsrt in self._nsrts:
                     sampler = nsrt.sampler.__self__
-                    sampler_name_to_sampler[nsrt.name] = _LearnedSampler(sampler._classifier, sampler._regressor, sampler._variables, None)
+                    sampler_name_to_sampler[nsrt.name] = _LearnedSampler(
+                        sampler._classifier, sampler._regressor,
+                        sampler._variables, None)
                 pkl.dump(sampler_name_to_sampler, f)
 
         with open(f"{save_path}_{online_learning_cycle}.NSRTs", "wb") as f:
@@ -187,10 +193,12 @@ class NSRTLearningApproach(BilevelPlanningApproach):
             self._nsrts = pkl.load(f)
         if CFG.env == "behavior":
             assert isinstance(self._nsrts, str)
-            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs", "rb") as f:
+            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs",
+                      "rb") as f:
                 sampler_name_to_sampler = pkl.load(f)
             # Implement string_nsrts to _nsrts
-            self._nsrts = self.parse_nsrts_string(self._nsrts, sampler_name_to_sampler)
+            self._nsrts = self.parse_nsrts_string(self._nsrts,
+                                                  sampler_name_to_sampler)
         if CFG.pretty_print_when_loading:
             preds, _ = utils.extract_preds_and_types(self._nsrts)
             name_map = {}
@@ -273,26 +281,40 @@ class NSRTLearningApproach(BilevelPlanningApproach):
         logging.info(f"\tGot num_plans_up_to_n {num_plans_up_to_n} and "
                      f"complexity {complexity}")
 
-
-    def parse_nsrts_string(self, nsrts_string: str, sampler_name_to_sampler: Dict[str, _LearnedSampler]) -> Set[NSRT]:
+    def parse_nsrts_string(
+            self, nsrts_string: str,
+            sampler_name_to_sampler: Dict[str, _LearnedSampler]) -> Set[NSRT]:
         assert CFG.env == "behavior"
         nsrts = set()
         type_name_to_type = self._get_from_env_by_names_dict(CFG.env, "types")
-        pred_name_to_pred = self._get_from_env_by_names_dict(CFG.env, "predicates")
-        option_name_to_option = self._get_from_env_by_names_dict(CFG.env, "options")
+        pred_name_to_pred = self._get_from_env_by_names_dict(
+            CFG.env, "predicates")
+        option_name_to_option = self._get_from_env_by_names_dict(
+            CFG.env, "options")
 
-        for nsrt_string in nsrts_string.replace("{","").replace("}","").split("NSRT-")[1:]:
-            name, params, precond, add_effects, delete_effects, ignore_effects, option_spec = nsrt_string.split("\n    ")
-            name = name.replace(":","")
-            params = [param.split(":") for param in re.findall(r"\[(.*?)\]", params)[0].split(", ")]
+        for nsrt_string in nsrts_string.replace("{", "").replace(
+                "}", "").split("NSRT-")[1:]:
+            name, params, precond, add_effects, delete_effects, ignore_effects, option_spec = nsrt_string.split(
+                "\n    ")
+            name = name.replace(":", "")
+            params = [
+                param.split(":")
+                for param in re.findall(r"\[(.*?)\]", params)[0].split(", ")
+            ]
             add_effects = re.findall(r"\[(.*?)\]", add_effects)[0].split(", ")
             precond = re.findall(r"\[(.*?)\]", precond)[0].split(", ")
-            delete_effects = re.findall(r"\[(.*?)\]", delete_effects)[0].split(", ")
-            ignore_effects = re.findall(r"\[(.*?)\]", ignore_effects)[0].split(", ")
-            option_spec = option_spec.replace(", ","").split(": ")[1]
+            delete_effects = re.findall(r"\[(.*?)\]",
+                                        delete_effects)[0].split(", ")
+            ignore_effects = re.findall(r"\[(.*?)\]",
+                                        ignore_effects)[0].split(", ")
+            option_spec = option_spec.replace(", ", "").split(": ")[1]
 
             # Parameters
-            nsrt_parameters = set([Variable(param[0], type_name_to_type[param[1]]) for param in params])
+            nsrt_parameters = set([
+                Variable(param[0], type_name_to_type[param[1]])
+                for param in params
+            ])
+
             # Predicates (precond, add_effects, delete_effects)
             def unparsed_preds_to_predicates(unparsed_preds):
                 predicates = set()
@@ -300,13 +322,22 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                     return predicates
                 for unparsed_pred in unparsed_preds:
                     pred_name = unparsed_pred.split("(")[0]
-                    pred_vars = [pred_var.split(":") for pred_var in re.findall(r"\((.*?)\)", unparsed_pred)[0].split(", ")]
+                    pred_vars = [
+                        pred_var.split(":") for pred_var in re.findall(
+                            r"\((.*?)\)", unparsed_pred)[0].split(", ")
+                    ]
                     if pred_vars[0] == [""]:
                         args = []
                     else:
-                        args = [Variable(pred_var[0], type_name_to_type[pred_var[1]]) for pred_var in pred_vars]
-                    predicates.add(LiftedAtom(pred_name_to_pred[pred_name], args))
+                        args = [
+                            Variable(pred_var[0],
+                                     type_name_to_type[pred_var[1]])
+                            for pred_var in pred_vars
+                        ]
+                    predicates.add(
+                        LiftedAtom(pred_name_to_pred[pred_name], args))
                 return predicates
+
             nsrt_precond = unparsed_preds_to_predicates(precond)
             nsrt_add_effects = unparsed_preds_to_predicates(add_effects)
             nsrt_delete_effects = unparsed_preds_to_predicates(delete_effects)
@@ -314,16 +345,29 @@ class NSRTLearningApproach(BilevelPlanningApproach):
             if ignore_effects == [""]:
                 nsrt_ignore_effects = set()
             else:
-                nsrt_ignore_effects = set([pred_name_to_pred[ignore_effect] for ignore_effect in ignore_effects])
+                nsrt_ignore_effects = set([
+                    pred_name_to_pred[ignore_effect]
+                    for ignore_effect in ignore_effects
+                ])
             # Option Spec
             nsrt_option = option_name_to_option[option_spec.split("(")[0]]
-            option_vars = [option_var.split(":") for option_var in re.findall(r"\((.*?)\)", option_spec)[0].split(", ")]
-            nsrt_option_vars = [Variable(option_var[0], type_name_to_type[option_var[1]]) for option_var in option_vars]
+            option_vars = [
+                option_var.split(":") for option_var in re.findall(
+                    r"\((.*?)\)", option_spec)[0].split(", ")
+            ]
+            nsrt_option_vars = [
+                Variable(option_var[0], type_name_to_type[option_var[1]])
+                for option_var in option_vars
+            ]
             # Sampler
             sampler = sampler_name_to_sampler[name]
-            nsrt_sampler = _LearnedSampler(sampler._classifier, sampler._regressor, sampler._variables, nsrt_option).sampler
+            nsrt_sampler = _LearnedSampler(sampler._classifier,
+                                           sampler._regressor,
+                                           sampler._variables,
+                                           nsrt_option).sampler
 
-            nsrts.add(NSRT(name, nsrt_parameters, nsrt_precond,
-                        nsrt_add_effects, nsrt_delete_effects, nsrt_ignore_effects,
-                        nsrt_option, nsrt_option_vars, nsrt_sampler))
+            nsrts.add(
+                NSRT(name, nsrt_parameters, nsrt_precond, nsrt_add_effects,
+                     nsrt_delete_effects, nsrt_ignore_effects, nsrt_option,
+                     nsrt_option_vars, nsrt_sampler))
         return nsrts

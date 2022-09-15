@@ -19,6 +19,18 @@ OPEN_PICK_PLACE_TASKS = [
     'locking_every_door', 'putting_dishes_away_after_cleaning',
     'picking_up_trash', 'packing_food_for_work'
 ]
+# OPEN_PICK_PLACE_TASKS = [
+#     'collecting_aluminum_cans', 'throwing_away_leftovers',
+#     'packing_bags_or_suitcase', 'packing_boxes_for_household_move_or_trip',
+#     'opening_presents', 'organizing_file_cabinet', 'locking_every_window',
+#     'packing_car_for_trip', 're-shelving_library_books', 'storing_food',
+#     'organizing_boxes_in_garage', 'putting_leftovers_away',
+#     'unpacking_suitcase', 'putting_away_toys', 'boxing_books_up_for_storage',
+#     'sorting_books', 'clearing_the_table_after_dinner', 'opening_packages',
+#     'picking_up_take-out_food', 'collect_misplaced_items',
+#     'locking_every_door', 'putting_dishes_away_after_cleaning',
+#     'picking_up_trash', 'packing_food_for_work'
+# ]
 
 
 def _run_behavior_pickplaceopen_tests() -> None:

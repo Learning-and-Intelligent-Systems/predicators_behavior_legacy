@@ -441,7 +441,9 @@ def check_hand_end_pose(env: "BehaviorEnv", obj: Union["URDFObject",
 
     return ret_bool
 
-def reset_igibson_behavior_env_from_task_num_task_instance_id(env, new_task_num_task_instance_id):
+
+def reset_igibson_behavior_env_from_task_num_task_instance_id(
+        env, new_task_num_task_instance_id):
     # Frame count is overwritten by set_igibson_behavior_env and needs to
     # be preserved across resets. So we save it before and set it after
     # we reset the env.
@@ -457,6 +459,7 @@ def reset_igibson_behavior_env_from_task_num_task_instance_id(env, new_task_num_
     )  # overwrite the old task_init checkpoint file!
     env.igibson_behavior_env.reset()
     return env
+
 
 def load_checkpoint_state(s: State,
                           env: "BehaviorEnv",
@@ -488,9 +491,11 @@ def load_checkpoint_state(s: State,
     if (new_task_num_task_instance_id != (env.task_num, env.task_instance_id)
             and CFG.behavior_randomize_init_state) or reset:
         env.task_instance_id = new_task_num_task_instance_id[1]
-        env = reset_igibson_behavior_env_from_task_num_task_instance_id(env, new_task_num_task_instance_id)
+        env = reset_igibson_behavior_env_from_task_num_task_instance_id(
+            env, new_task_num_task_instance_id)
     behavior_task_name = CFG.behavior_task_list[0] if len(
-        CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list))
+        CFG.behavior_task_list) == 1 else hash(
+            frozenset(CFG.behavior_task_list))
     try:
         load_checkpoint(
             env.igibson_behavior_env.simulator,
@@ -499,14 +504,15 @@ def load_checkpoint_state(s: State,
             f"{CFG.seed}__{env.task_num}__{env.task_instance_id}",
             int(s.simulator_state.split("-")[2]))
     except p.error:
-        env = reset_igibson_behavior_env_from_task_num_task_instance_id(env, new_task_num_task_instance_id)
+        env = reset_igibson_behavior_env_from_task_num_task_instance_id(
+            env, new_task_num_task_instance_id)
         load_checkpoint(
             env.igibson_behavior_env.simulator,
             f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
             f"{behavior_task_name}__{CFG.num_train_tasks}__" +
             f"{CFG.seed}__{env.task_num}__{env.task_instance_id}",
             int(s.simulator_state.split("-")[2]))
-        
+
     np.random.seed(env.task_num_task_instance_id_to_igibson_seed[
         new_task_num_task_instance_id])
     # We step the environment to update the visuals of where the robot is!
