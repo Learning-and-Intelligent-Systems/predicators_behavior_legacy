@@ -6,7 +6,7 @@ import numpy as np
 import pybullet as p
 
 from predicators.settings import CFG
-from predicators.structs import Array, GroundAtomTrajectory, \
+from predicators.structs import NSRT, Array, GroundAtomTrajectory, \
     LowLevelTrajectory, Predicate, Set, State
 from predicators.utils import abstract
 
@@ -487,13 +487,16 @@ def load_checkpoint_state(s: State,
         )  # overwrite the old task_init checkpoint file!
         env.igibson_behavior_env.reset()
     behavior_task_name = CFG.behavior_task_list[0] if len(
-        CFG.behavior_task_list) == 1 else "all"
-    load_checkpoint(
-        env.igibson_behavior_env.simulator,
-        f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
-        f"{behavior_task_name}__{CFG.num_train_tasks}__" +
-        f"{CFG.seed}__{env.task_num}__{env.task_instance_id}",
-        int(s.simulator_state.split("-")[2]))
+        CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list + CFG.behavior_scene_list))
+    try:
+        load_checkpoint(
+            env.igibson_behavior_env.simulator,
+            f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
+            f"{behavior_task_name}__{CFG.num_train_tasks}__" +
+            f"{CFG.seed}__{env.task_num}__{env.task_instance_id}",
+            int(s.simulator_state.split("-")[2]))
+    except:
+        import ipdb; ipdb.set_trace()
     np.random.seed(env.task_num_task_instance_id_to_igibson_seed[
         new_task_num_task_instance_id])
     # We step the environment to update the visuals of where the robot is!

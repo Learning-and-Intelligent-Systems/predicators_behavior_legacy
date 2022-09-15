@@ -94,7 +94,7 @@ class BehaviorEnv(BaseEnv):
                 int(self._rng.integers(0, len(CFG.behavior_task_list)))
                 for _ in range(CFG.num_train_tasks + CFG.num_test_tasks)
             ]
-            self.scene_list = [
+            CFG.behavior_scene_list = [
                 self.get_random_scene_for_task(CFG.behavior_task_list[i],
                                                self._rng)
                 for i in self.task_list_indices
@@ -186,7 +186,7 @@ class BehaviorEnv(BaseEnv):
         task_index = self.task_list_indices[task_num]
         self._config_file = modify_config_file(
             os.path.join(igibson.root_path, CFG.behavior_config_file),
-            CFG.behavior_task_list[task_index], self.scene_list[task_num],
+            CFG.behavior_task_list[task_index], CFG.behavior_scene_list[task_num],
             False)
 
     def get_random_scene_for_task(self, behavior_task_name: str,
@@ -275,7 +275,7 @@ class BehaviorEnv(BaseEnv):
             self.task_num_task_instance_id_to_igibson_seed[(
                 self.task_num, self.task_instance_id)] = curr_env_seed
             behavior_task_name = CFG.behavior_task_list[0] if len(
-                CFG.behavior_task_list) == 1 else "all"
+                CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list + CFG.behavior_scene_list))
             os.makedirs(f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
                         f"{behavior_task_name}__{CFG.num_train_tasks}__" +
                         f"{CFG.seed}__{self.task_num}__" +
@@ -561,7 +561,7 @@ class BehaviorEnv(BaseEnv):
         simulator_state = None
         if save_state:
             behavior_task_name = CFG.behavior_task_list[0] if len(
-                CFG.behavior_task_list) == 1 else "all"
+                CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list + CFG.behavior_scene_list))
             simulator_state = save_checkpoint(
                 self.igibson_behavior_env.simulator,
                 f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
