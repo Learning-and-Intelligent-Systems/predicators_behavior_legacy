@@ -487,7 +487,7 @@ def load_checkpoint_state(s: State,
         )  # overwrite the old task_init checkpoint file!
         env.igibson_behavior_env.reset()
     behavior_task_name = CFG.behavior_task_list[0] if len(
-        CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list + CFG.behavior_scene_list))
+        CFG.behavior_task_list) == 1 else hash(frozenset(CFG.behavior_task_list))
     try:
         load_checkpoint(
             env.igibson_behavior_env.simulator,
