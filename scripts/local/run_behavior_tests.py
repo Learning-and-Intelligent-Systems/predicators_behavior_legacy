@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 
-NUM_TEST = 3
+NUM_TEST = 10
 SEED = 0
 TIMEOUT = 500
 OPEN_PICK_PLACE_TASKS = [
@@ -66,7 +66,8 @@ def _run_behavior_pickplaceopen_tests() -> None:
                             "--sesame_task_planner fdopt "
                             "--behavior_option_model_eval True "
                             "--plan_only_eval True "
-                            f"--results_dir {logfolder}")
+                            f"--results_dir {logfolder} "
+                            f"--log_file {logfolder}log.log")
 
     # Run the commands in order.
     num_cmds = len(cmds)
