@@ -20,8 +20,8 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
     1. You will receive a encryption key (`igibson.key`). Move the key into the data folder of the iGibson repository, `iGibson/igibson/data`.    
     1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes, then extract them into the `iGibson/igibson/data` folder.
     ```
-    wget https://storage.googleapis.com/gibson_scenes/assets_igibson.tar.gz
-    tar -zxf assets_igibson.tar.gz --directory ./iGibson/igibson/data/assets
+    wget https://storage.googleapis.com/gibson_scenes/ig_dataset.tar.gz
+    tar -zxf ig_dataset.tar.gz --directory ./iGibson/igibson/data
     ```
 1. Make sure there is no version of `pybullet` currently installed in your virtual environment (if there is, it will create problems for the next step). You can do this with `pip uninstall pybullet`.
 1. Within a virtual environment (preferably, the one you created to install this overall repository), install the downloaded repositories:
@@ -31,7 +31,8 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
     ```
 1. Download the iGibson assets that include robot models
     ```
-    python -m igibson.utils.assets_utils --download_assets
+    wget https://storage.googleapis.com/gibson_scenes/assets_igibson.tar.gz
+    tar -zxf assets_igibson.tar.gz --directory ./iGibson/igibson/data/assets
     ```
 
 That's it! You can verify installation by running a simple command such as:
@@ -42,13 +43,7 @@ python predicators/main.py --env behavior --approach oracle --option_model_name 
 ## Installing on MIT Supercloud
 First, follow steps in our [Supercloud guide](supercloud.md) to get an account and setup this repository on Supercloud.
 
-Next, simply follow the steps linked in the [above section](#installation) (though ignore the first two steps)! Instead of the final step (downloading assets), run:
-```
-wget https://storage.googleapis.com/gibson_scenes/ig_dataset.tar.gz
-tar -zxf ig_dataset.tar.gz --directory ./iGibson/igibson/data
-```
-
-Also note that for various driver-related reasons, this code only works on GPU-machines with supercloud (so always remember to request a GPU when submitting jobs involving this codebase).
+Next, simply follow the steps linked in the [above section](#installation) (though ignore the first two steps)! Note that for various driver-related reasons, this code only works on GPU-machines with supercloud (so always remember to request a GPU when submitting jobs involving this codebase).
 
 To test installation, do:
 ```
