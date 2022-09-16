@@ -29,6 +29,13 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
     pip install -e ./iGibson
     pip install -e ./bddl
     ```
+    1. Note that if you're on MIT Supercloud, you'll need to create a separate temp directory for pip to cache files to avoid an out-of-memory issue:
+    ```
+    mkdir /state/partition1/user/$USER
+    export TMPDIR=/state/partition1/user/$USER
+    pip install --user --no-cache-dir -e ./iGibson
+    pip install --user --no-cache-dir -e ./bddl
+    ```
 1. Download the iGibson assets that include robot models
     ```
     wget https://storage.googleapis.com/gibson_scenes/assets_igibson.tar.gz
