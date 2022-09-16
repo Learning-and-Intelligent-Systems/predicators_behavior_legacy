@@ -18,11 +18,11 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
 1. Download and obtain access to the BEHAVIOR Dataset of Objects (3D assets with physical and semantic annotations) 
     1. Accept the license agreement filling the [form](https://forms.gle/GXAacjpnotKkM2An7). This allows you to use the assets within iGibson for free for your research.    
     1. You will receive a encryption key (`igibson.key`). Move the key into the data folder of the iGibson repository, `iGibson/igibson/data`.    
-    1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes from [form](https://forms.gle/GXAacjpnotKkM2An7).
-    1. Decompress the BEHAVIOR data bundle and move it into the `iGibson/igibson/data` folder:
-        ```
-        unzip behavior_data_bundle.zip -d iGibson/igibson/data
-        ```
+    1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes, then extract them into the `iGibson/igibson/data` folder.
+    ```
+    wget https://storage.googleapis.com/gibson_scenes/assets_igibson.tar.gz
+    tar -zxf assets_igibson.tar.gz --directory ./iGibson/igibson/data/assets
+    ```
 1. Make sure there is no version of `pybullet` currently installed in your virtual environment (if there is, it will create problems for the next step). You can do this with `pip uninstall pybullet`.
 1. Within a virtual environment (preferably, the one you created to install this overall repository), install the downloaded repositories:
     ```
@@ -36,7 +36,26 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
 
 That's it! You can verify installation by running a simple command such as:
 ```
-python predicators/main.py --env behavior --approach oracle --behavior_mode simple --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Rs_int --behavior_task_name locking_every_window --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True
+python predicators/main.py --env behavior --approach oracle --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Pomaria_2_int --behavior_task_list "[opening_packages]" --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True
+```
+
+## Installing on MIT Supercloud
+First, follow steps in our [Supercloud guide](supercloud.md) to get an account and setup this repository on Supercloud.
+
+Next, simply follow the steps linked in the [above section](#installation) (though ignore the first two steps)! Instead of the final step (downloading assets), run:
+```
+wget https://storage.googleapis.com/gibson_scenes/ig_dataset.tar.gz
+tar -zxf ig_dataset.tar.gz --directory ./iGibson/igibson/data
+```
+
+Also note that for various driver-related reasons, this code only works on GPU-machines with supercloud (so always remember to request a GPU when submitting jobs involving this codebase).
+
+To test installation, do:
+```
+LLsub -i -g volta:1  # request a compute node with GPU in interactive mode.
+predicate_behavior  # cd to the predicators_behavior repo and activate the relevant conda environment.
+# Run a sample command. You should see the agent output 1/1 tasks solved!
+python predicators/main.py --env behavior --approach oracle --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Pomaria_2_int --behavior_task_list "[opening_packages]" --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True
 ```
 
 ## Running Experiments
@@ -47,4 +66,4 @@ python predicators/main.py --env behavior --approach oracle --behavior_mode simp
 * Set `--behavior_scene_name` to the name of the house setting (e.g. `Pomaria_1_int`) you want to try running the particular task in. Note that not all tasks are available in all houses (e.g. `re-shelving_library_books` might only be available with `Pomaria_1_int`).
 * If you'd like to see a visual of the agent planning in iGibson, set the command line argument `--behavior_mode simple`. If you want to run in headless mode without any visuals, leave the default (i.e `--behavior_mode headless`).
 * Be sure to set `--plan_only_eval True`: this is necessary to account for the fact that the iGibson simulator is non-deterministic when saving and loading states (which is currently an unresolved bug).
-* Example command: `python predicators/main.py --env behavior --approach oracle --behavior_mode simple --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Rs_int --behavior_task_name locking_every_window --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True`.
+* Example command: `python predicators/main.py --env behavior --approach oracle --option_model_name oracle_behavior --num_train_tasks 0 --num_test_tasks 1 --behavior_scene_name Pomaria_2_int --behavior_task_list "[opening_packages]" --seed 1000 --offline_data_planning_timeout 500.0 --timeout 500.0 --behavior_option_model_eval True --plan_only_eval True`.
