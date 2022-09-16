@@ -9,14 +9,14 @@ NUM_TEST = 5
 SEED = 0
 TIMEOUT = 500
 OPEN_PICK_PLACE_TASKS = [
-    're-shelving_library_books',
-    'collecting_aluminum_cans',
-    'throwing_away_leftovers',
+    'opening_packages',
     'opening_presents',
     'locking_every_door',
     'locking_every_window',
-    'opening_packages',
-    'sorting_books'
+    'sorting_books',
+    're-shelving_library_books',
+    'collecting_aluminum_cans',
+    'throwing_away_leftovers'
 ]
 # OPEN_PICK_PLACE_TASKS = [
 #     'collecting_aluminum_cans', 'throwing_away_leftovers',

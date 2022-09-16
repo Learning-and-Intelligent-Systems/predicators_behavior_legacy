@@ -4,18 +4,18 @@ import json
 import os
 import shutil
 
-NUM_TEST = 10
+NUM_TEST = 3
 SEED = 0
 TIMEOUT = 500
 OPEN_PICK_PLACE_TASKS = [
-    're-shelving_library_books',
-    'collecting_aluminum_cans',
-    'throwing_away_leftovers',
+    'opening_packages',
     'opening_presents',
     'locking_every_door',
     'locking_every_window',
-    'opening_packages',
-    'sorting_books'
+    'sorting_books',
+    're-shelving_library_books',
+    'collecting_aluminum_cans',
+    'throwing_away_leftovers'
 ]
 # OPEN_PICK_PLACE_TASKS = [
 #     'collecting_aluminum_cans', 'throwing_away_leftovers',
@@ -56,13 +56,14 @@ def _run_behavior_pickplaceopen_tests() -> None:
                             "--approach oracle "
                             "--behavior_mode headless "
                             "--option_model_name oracle_behavior "
-                            "--num_train_tasks 1 "
+                            "--num_train_tasks 0 "
                             f"--num_test_tasks {NUM_TEST} "
                             f"--behavior_scene_name {scene} "
                             f"--behavior_task_list \"[{task}]\" "
                             f"--seed {SEED} "
                             f"--offline_data_planning_timeout {TIMEOUT} "
                             f"--timeout {TIMEOUT} "
+                            "--sesame_task_planner fdopt "
                             "--behavior_option_model_eval True "
                             "--plan_only_eval True "
                             f"--results_dir {logfolder}")
