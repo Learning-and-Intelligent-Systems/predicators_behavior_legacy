@@ -18,10 +18,11 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
 1. Download and obtain access to the BEHAVIOR Dataset of Objects (3D assets with physical and semantic annotations) 
     1. Accept the license agreement filling the [form](https://forms.gle/GXAacjpnotKkM2An7). This allows you to use the assets within iGibson for free for your research.    
     1. You will receive a encryption key (`igibson.key`). Move the key into the data folder of the iGibson repository, `iGibson/igibson/data`.    
-    1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes, then extract them into the `iGibson/igibson/data` folder.
+    1. Download the BEHAVIOR data bundle including the BEHAVIOR Dataset of Objects and the iGibson2 Dataset of scenes, and particular robot assets. There will be two sub-folders: `ig_dataset` and `assets` that need to be extracted into the `iGibson/igibson/data` folder.
     ```
-    wget https://storage.googleapis.com/gibson_scenes/ig_dataset.tar.gz
-    tar -zxf ig_dataset.tar.gz --directory ./iGibson/igibson/data
+    wget https://www.dropbox.com/s/p8ljo8yeanrjfgc/assets_ig_dataset.zip?dl=0
+    mv assets_ig_dataset.zip\?dl\=0 ./assets_ig_dataset.zip
+    unzip assets_ig_dataset.zip -d ./iGibson/igibson/data/
     ```
 1. Make sure there is no version of `pybullet` currently installed in your virtual environment (if there is, it will create problems for the next step). You can do this with `pip uninstall pybullet`.
 1. Within a virtual environment (preferably, the one you created to install this overall repository), install the downloaded repositories:
@@ -35,11 +36,6 @@ This repository is integrated with the [BEHAVIOR benchmark of tasks](https://beh
     export TMPDIR=/state/partition1/user/$USER
     pip install --user --no-cache-dir -e ./iGibson
     pip install --user --no-cache-dir -e ./bddl
-    ```
-1. Download the iGibson assets that include robot models
-    ```
-    wget https://storage.googleapis.com/gibson_scenes/assets_igibson.tar.gz
-    tar -zxf assets_igibson.tar.gz --directory ./iGibson/igibson/data/assets
     ```
 
 That's it! You can verify installation by running a simple command such as:
