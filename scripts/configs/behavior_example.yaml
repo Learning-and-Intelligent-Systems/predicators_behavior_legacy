@@ -3,13 +3,17 @@
 APPROACHES:
   my-oracle:  # used in constructing the experiment ID
     NAME: "oracle"
-    FLAGS: {}
-ENVS:
-  throwing-away-leftovers:
-    NAME: "cover"
     FLAGS:
-      cover_num_blocks: 1
-      cover_block_widths: [0.1]
+      offline_data_planning_timeout: 500.0
+      timeout: 500.0
+      plan_only_eval: True
+ENVS:
+  openining-packages-Pomaria_2_int:
+    NAME: "behavior"
+    FLAGS:
+      behavior_scene_name: Pomaria_2_int
+      behavior_task_list: "[opening_packages]"
+      behavior_option_model_eval: True
 FLAGS:  # general flags
   num_train_tasks: 0
   num_test_tasks: 10
