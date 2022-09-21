@@ -1,0 +1,17 @@
+# An example configuration file.
+---
+APPROACHES:
+  my-oracle:  # used in constructing the experiment ID
+    NAME: "oracle"
+    FLAGS: {}
+ENVS:
+  throwing-away-leftovers:
+    NAME: "cover"
+    FLAGS:
+      cover_num_blocks: 1
+      cover_block_widths: [0.1]
+FLAGS:  # general flags
+  num_train_tasks: 0
+  num_test_tasks: 10
+START_SEED: 456
+NUM_SEEDS: 3
