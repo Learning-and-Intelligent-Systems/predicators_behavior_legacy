@@ -7,6 +7,7 @@ APPROACHES:
       offline_data_planning_timeout: 500.0
       timeout: 500.0
       plan_only_eval: True
+      sesame_task_planner: fdopt
 ENVS:
   openining-packages-Pomaria_2_int:
     NAME: "behavior"
