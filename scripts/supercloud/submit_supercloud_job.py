@@ -42,11 +42,12 @@ def submit_supercloud_job(job_name: str,
     with open(temp_run_file, "w", encoding="utf-8") as f:
         f.write(mystr)
     cmd = ("sbatch --time=99:00:00 --partition=xeon-p8 "
-           f"--nodes=1 --exclusive --job-name={job_name} "
-           f"--array={start_seed}-{start_seed+num_seeds-1} "
-           f"-o {logfile_pattern} {temp_run_file}")
+           "--nodes=1 --exclusive")
     if use_gpu:
         cmd += " --gres=gpu:volta:1"
+    cmd += (f"--job-name={job_name}"
+           f"--array={start_seed}-{start_seed+num_seeds-1} "
+           f"-o {logfile_pattern} {temp_run_file}")
     print(f"Running command: {cmd}")
     output = subprocess.getoutput(cmd)
     if "command not found" in output:
