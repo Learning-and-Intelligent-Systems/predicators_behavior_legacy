@@ -9,7 +9,7 @@ APPROACHES:
       plan_only_eval: True
       sesame_task_planner: fdopt
 ENVS:
-  openining-packages-Pomaria_2_int:
+  opening-packages-Pomaria_2_int:
     NAME: "behavior"
     FLAGS:
       behavior_scene_name: Pomaria_2_int
