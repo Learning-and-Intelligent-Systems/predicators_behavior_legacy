@@ -6,14 +6,14 @@ import glob
 import dill as pkl
 
 tasks_to_test = [
-    're-shelving_library_books',
-    'collecting_aluminum_cans',
-    'throwing_away_leftovers',
+    'opening_packages',
     'opening_presents',
     'locking_every_door',
     'locking_every_window',
-    'opening_packages',
-    'sorting_books'
+    # 'sorting_books',
+    # 're-shelving_library_books',
+    # 'collecting_aluminum_cans',
+    # 'throwing_away_leftovers'
 ]
 
 TIMEOUT = 500
@@ -30,6 +30,7 @@ for filename in glob.glob(f"logs/*{TIMEOUT}/*"):
             break
         task += c
     task = task[:-1]
+    print(task, data['results']['num_solved'])
     # Append whether task was solved or not.
     if data['results']['num_solved'] != 0:
         tasks.append([task, True])

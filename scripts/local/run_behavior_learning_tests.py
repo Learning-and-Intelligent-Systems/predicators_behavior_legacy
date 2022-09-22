@@ -7,7 +7,7 @@ import shutil
 NUM_TRAIN = 10
 NUM_TEST = 5
 SEED = 0
-TIMEOUT = 500
+TIMEOUT = 1000
 OPEN_PICK_PLACE_TASKS = [
     'opening_packages',
     'opening_presents',
@@ -69,9 +69,9 @@ def _run_behavior_pickplaceopen_tests() -> None:
                             "--behavior_option_model_eval True "
                             "--plan_only_eval True "
                             "--sesame_task_planner fdopt "
-                            "--data_orderings_to_search 5 "
-                            "--enable_harmless_op_pruning True "
-                            f"--results_dir {logfolder}")
+                            "--disable_harmlessness_check True "
+                            f"--results_dir {logfolder} "
+                            f"--log_file {logfolder}log.log")
 
     # Run the commands in order.
     num_cmds = len(cmds)
