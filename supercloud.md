@@ -40,7 +40,8 @@ To test if it worked:
 # Start an interactive session.
 LLsub -i
 # Activate conda and switch to the repository.
-predicate_behavior
+conda activate predicators_behavior
+cd predicators_behavior
 # Run a short experiment.
 python predicators/main.py --env cover --approach oracle --seed 0
 # Exit the interactive session.
