@@ -20,7 +20,7 @@ TIMEOUT = 500
 
 # Globs logs for tasks with results file.
 tasks = []
-for filename in glob.glob(f"logs/*{TIMEOUT}/*"):
+for filename in glob.glob(f"logs/*{TIMEOUT}/*.pkl"):
     with open(filename, "rb") as f:
         data = pkl.load(f)
     # Get task name.
@@ -32,6 +32,7 @@ for filename in glob.glob(f"logs/*{TIMEOUT}/*"):
     task = task[:-1]
     print(task, data['results']['num_solved'])
     # Append whether task was solved or not.
+    print(task, data['results']['num_solved'])
     if data['results']['num_solved'] != 0:
         tasks.append([task, True])
     else:
