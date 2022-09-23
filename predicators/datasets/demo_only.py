@@ -57,7 +57,7 @@ def create_demo_data(env: BaseEnv, train_tasks: List[Task],
             info["behavior_task_list"] = CFG.behavior_task_list
             info["behavior_scene_name"] = CFG.behavior_scene_name
             info["seed"] = CFG.seed
-            isinstance(env, BehaviorEnv)
+            assert isinstance(env, BehaviorEnv)
             if len(CFG.behavior_task_list) != 1:
                 info["task_list_indices"] = env.task_list_indices
                 info["scene_list"] = env.scene_list
