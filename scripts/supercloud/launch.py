@@ -4,6 +4,12 @@ Usage example:
 
     python scripts/supercloud/launch.py --config example_basic.yaml --user tslvr
 
+Usage example with supercloud dir:
+
+    python scripts/supercloud/launch.py --config example_basic.yaml \
+        --user njk --transfer_local_data \
+        --supercloud_dir ~/GitHub/research/predicators_behavior
+
 The default branch can be overridden with the --branch flag.
 """
 
