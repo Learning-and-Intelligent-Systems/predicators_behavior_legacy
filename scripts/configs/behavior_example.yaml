@@ -2,12 +2,12 @@
 ---
 APPROACHES:
   my-oracle:  # used in constructing the experiment ID
-    NAME: "oracle"
-    FLAGS:
-      offline_data_planning_timeout: 500.0
-      timeout: 500.0
-      plan_only_eval: True
-      sesame_task_planner: fdopt
+    # NAME: "oracle"
+    # FLAGS:
+    #   offline_data_planning_timeout: 500.0
+    #   timeout: 500.0
+    #   plan_only_eval: True
+    #   sesame_task_planner: fdopt
   backchaining:
     NAME: "nsrt_learning"
     FLAGS:
@@ -24,7 +24,9 @@ ENVS:
       behavior_scene_name: Pomaria_2_int
       behavior_task_list: "[opening_packages]"
       behavior_option_model_eval: True
-ARGS: {}
+ARGS:
+  - "load_atoms"
+  - "load_data"
 FLAGS:  # general flags
   num_train_tasks: 10
   num_test_tasks: 10
