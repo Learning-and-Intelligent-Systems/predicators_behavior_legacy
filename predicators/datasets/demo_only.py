@@ -52,7 +52,8 @@ def create_demo_data(env: BaseEnv, train_tasks: List[Task],
         with open(dataset_fname, "wb") as f:
             pkl.dump(dataset, f)
         # Pickle information about dataset created.
-        if CFG.env == "beahavior":  # pragma: no cover
+        if CFG.env == "behavior":  # pragma: no cover
+            isinstance(env, BehaviorEnv)
             info = {}
             info["behavior_task_list"] = CFG.behavior_task_list
             info["behavior_scene_name"] = CFG.behavior_scene_name
