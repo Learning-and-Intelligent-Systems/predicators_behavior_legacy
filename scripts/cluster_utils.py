@@ -123,7 +123,7 @@ def get_cmds_to_prep_repo(branch: str) -> List[str]:
         f"git checkout {branch}",
         "git pull",
         # Remove old results.
-        "rm -f results/* logs/* saved_approaches/* saved_datasets/*",
+        "rm -f results/* logs/* saved_approaches/* saved_datasets/*, tmp_behavior_states/*",
     ]
 
 
@@ -140,10 +140,17 @@ def run_cmds_on_machine(
         ssh_cmd += f" -i {ssh_key}"
     server_cmd_str = "\n".join(cmds + ["exit"])
     final_cmd = f"{ssh_cmd} << EOF\n{server_cmd_str}\nEOF"
-    response = subprocess.run(final_cmd,
+    run_command_with_subprocess(final_cmd, allowed_return_codes)
+
+
+def run_command_with_subprocess(
+    cmd: str, allowed_return_codes: Tuple[int, ...] = (0, )) -> None:
+    """Run a command string with subprocess.run and raise an error if the
+    return code is not as expected."""
+    response = subprocess.run(cmd,
                               stdout=subprocess.DEVNULL,
                               stderr=subprocess.STDOUT,
                               shell=True,
                               check=False)
     if response.returncode not in allowed_return_codes:
-        raise RuntimeError(f"Command failed: {final_cmd}")
+        raise RuntimeError(f"Command failed: {cmd}")
