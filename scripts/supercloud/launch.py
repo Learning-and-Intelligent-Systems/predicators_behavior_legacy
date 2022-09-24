@@ -14,7 +14,6 @@ The default branch can be overridden with the --branch flag.
 """
 
 import argparse
-import sys
 
 from scripts.cluster_utils import DEFAULT_BRANCH, SUPERCLOUD_IP, \
     BatchSeedRunConfig, config_to_cmd_flags, config_to_logfile, \
