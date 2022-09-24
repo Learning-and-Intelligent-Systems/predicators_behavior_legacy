@@ -128,8 +128,7 @@ def get_cmds_to_prep_repo(branch: str, transfer_local_data: bool) -> List[str]:
     ]
     if not transfer_local_data:
         ret_cmds.append(
-            "rm -f results/* logs/* saved_approaches/* saved_datasets/*"
-        )
+            "rm -f results/* logs/* saved_approaches/* saved_datasets/*")
 
     return ret_cmds
 
