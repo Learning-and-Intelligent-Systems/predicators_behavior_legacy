@@ -67,7 +67,10 @@ def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
         server_cmd_str = "\n".join(server_cmds + ["exit"])
         run_command_with_subprocess(server_cmd_str)
 
-    str_args = " ".join(["scripts/supercloud/launch.py", f"--config {config_file}", f"--user {user}"])
+    str_args = " ".join([
+        "scripts/supercloud/launch.py", f"--config {config_file}",
+        f"--user {user}"
+    ])
     # Enter the repo.
     server_cmds = ["predicate_behavior"]
     # Prepare the repo.

@@ -125,7 +125,7 @@ def get_cmds_to_prep_repo(branch: str, transfer_local_data: bool) -> List[str]:
     ]
     if not transfer_local_data:
         ret_cmds.append(
-            "rm -f results/* logs/* saved_approaches/* saved_datasets/*, tmp_behavior_states/*"
+            "rm -f results/* logs/* saved_approaches/* saved_datasets/*"
         )
 
     return ret_cmds
@@ -151,6 +151,7 @@ def run_command_with_subprocess(
     cmd: str, allowed_return_codes: Tuple[int, ...] = (0, )) -> None:
     """Run a command string with subprocess.run and raise an error if the
     return code is not as expected."""
+    print(cmd)
     response = subprocess.run(cmd,
                               stdout=subprocess.DEVNULL,
                               stderr=subprocess.STDOUT,
