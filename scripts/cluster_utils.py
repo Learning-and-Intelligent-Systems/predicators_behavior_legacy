@@ -128,7 +128,7 @@ def get_cmds_to_prep_repo(branch: str, transfer_local_data: bool) -> List[str]:
             "rm -f results/* logs/* saved_approaches/* saved_datasets/*, tmp_behavior_states/*"
         )
 
-    return
+    return ret_cmds
 
 
 def run_cmds_on_machine(
