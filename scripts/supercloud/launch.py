@@ -38,7 +38,7 @@ def _main() -> None:
     # run this file again, but with the --on_supercloud flag.
     if not args.on_supercloud:
         _launch_from_local(args.branch, args.user, args.transfer_local_data,
-                           args.supercloud_dir)
+                           args.supercloud_dir, args.config)
         print("Launched experiments.")
     # If we're already on supercloud, launch the experiments.
     else:
@@ -49,7 +49,7 @@ def _main() -> None:
 
 
 def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
-                       supercloud_dir: str) -> None:
+                       supercloud_dir: str, config_file: str) -> None:
     if transfer_local_data:
         # Enter the repo and wipe saved data, approaches and behavior states.
         server_cmds = ["predicate_behavior"]
@@ -68,7 +68,7 @@ def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
         server_cmd_str = "\n".join(server_cmds + ["exit"])
         run_command_with_subprocess(server_cmd_str)
 
-    str_args = " ".join(sys.argv)
+    str_args = " ".join(["scripts/supercloud/launch.py", f"--config {config_file}", f"--user {user}"])
     # Enter the repo.
     server_cmds = ["predicate_behavior"]
     # Prepare the repo.
