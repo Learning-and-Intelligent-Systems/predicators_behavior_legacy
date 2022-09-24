@@ -60,7 +60,7 @@ def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
         run_cmds_on_machine(server_cmds, user, SUPERCLOUD_IP)
         server_cmds = []
         for folder in [
-                "saved_approaches", "saved_datasets", "tmp_behavior_states"
+                "saved_approaches", "saved_datasets" "tmp_behavior_states"
         ]:
             cmd = "rsync -avzhe ssh " + \
               f"{folder}/* {user}@{SUPERCLOUD_IP}:{supercloud_dir}/{folder}"
