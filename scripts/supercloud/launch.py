@@ -72,7 +72,7 @@ def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
     # Enter the repo.
     server_cmds = ["predicate_behavior"]
     # Prepare the repo.
-    server_cmds.extend(get_cmds_to_prep_repo(branch))
+    server_cmds.extend(get_cmds_to_prep_repo(branch, transfer_local_data))
     # Finally, run this file again, but with the on_supercloud flag.
     server_cmds.append(f"python {str_args} --on_supercloud")
     run_cmds_on_machine(server_cmds, user, SUPERCLOUD_IP)

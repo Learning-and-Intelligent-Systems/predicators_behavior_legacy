@@ -113,18 +113,22 @@ def generate_run_configs(config_filename: str,
                                                   seed)
 
 
-def get_cmds_to_prep_repo(branch: str) -> List[str]:
+def get_cmds_to_prep_repo(branch: str, transfer_local_data: bool) -> List[str]:
     """Get the commands that should be run while already in the repository but
     before launching the experiments."""
-    return [
+    ret_cmds = [
         "mkdir -p logs",
         "git stash",
         "git fetch --all",
         f"git checkout {branch}",
         "git pull",
-        # Remove old results.
-        "rm -f results/* logs/* saved_approaches/* saved_datasets/*, tmp_behavior_states/*",
     ]
+    if not transfer_local_data:
+        ret_cmds.append(
+            "rm -f results/* logs/* saved_approaches/* saved_datasets/*, tmp_behavior_states/*"
+        )
+
+    return
 
 
 def run_cmds_on_machine(
