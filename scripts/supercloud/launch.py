@@ -54,13 +54,13 @@ def _launch_from_local(branch: str, user: str, transfer_local_data: bool,
         # Enter the repo and wipe saved data, approaches and behavior states.
         server_cmds = ["predicate_behavior"]
         server_cmds += [
-            "rm -f results/* logs/* saved_approaches/* saved_datasets/*, " +
-            "tmp_behavior_states/*"
+            "rm -f results/* logs/* saved_approaches/* saved_datasets/*"
         ]
+        server_cmds += ["rm -rf tmp_behavior_states/*"]
         run_cmds_on_machine(server_cmds, user, SUPERCLOUD_IP)
         server_cmds = []
         for folder in [
-                "saved_approaches", "saved_datasets" "tmp_behavior_states"
+                "saved_approaches", "saved_datasets", "tmp_behavior_states"
         ]:
             cmd = "rsync -avzhe ssh " + \
               f"{folder}/* {user}@{SUPERCLOUD_IP}:{supercloud_dir}/{folder}"
