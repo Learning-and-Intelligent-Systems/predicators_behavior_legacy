@@ -228,7 +228,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
         # of increasing length.
         assert CFG.sesame_task_planning_heuristic == "lmcut"
         logging.info("Computing sidelining objective value...")
-        start_time = time.time()
+        start_time = time.perf_counter()
         preds = self._get_current_predicates()
         strips_ops = [nsrt.op for nsrt in self._nsrts]
         option_specs = [(nsrt.option, list(nsrt.option_vars))
@@ -270,7 +270,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
         complexity = 0.0
         for op in strips_ops:
             complexity += op.get_complexity()
-        time_taken = time.time() - start_time
+        time_taken = time.perf_counter() - start_time
         self._metrics["sidelining_obj_num_plans_up_to_n"] = num_plans_up_to_n
         self._metrics["sidelining_obj_complexity"] = complexity
         self._metrics["sidelining_obj_time_taken"] = time_taken
