@@ -530,6 +530,7 @@ def test_backchaining_strips_learner_order_dependence():
         [moveto_book1, pick_book1, movetoshelf1, place_book1], True, 1)
     ground_atom_trajs = utils.create_ground_atom_dataset([traj1, traj2], preds)
     segmented_trajs = [segment_trajectory(traj) for traj in ground_atom_trajs]
+    utils.reset_config({"disable_harmlessness_check": False})
     # Now, run the learner on the demo.
     learner = _MockBackchainingSTRIPSLearner([traj1, traj2], [task1, task2],
                                              preds,
