@@ -79,11 +79,12 @@ class BehaviorEnv(BaseEnv):
                 os.path.join(igibson.root_path, CFG.behavior_config_file),
                 CFG.behavior_task_list[0],
                 self.get_random_scene_for_task(CFG.behavior_task_list[0],
-                                               rng), False)
+                                               rng), False, CFG.seed)
         else:
             self._config_file = modify_config_file(
                 os.path.join(igibson.root_path, CFG.behavior_config_file),
-                CFG.behavior_task_list[0], CFG.behavior_scene_name, False)
+                CFG.behavior_task_list[0], CFG.behavior_scene_name, False,
+                CFG.seed)
 
         super().__init__()  # To ensure self._seed is defined.
         self._rng = np.random.default_rng(self._seed)
@@ -160,7 +161,8 @@ class BehaviorEnv(BaseEnv):
         for (name, planner_fn, policy_fn, option_model_fn, param_dim, num_args,
              parameter_limits) in option_elems:
             # Create a different option for each type combo
-            for types in itertools.product(self.types, repeat=num_args):
+            for types in itertools.product(self.task_relevant_types,
+                                           repeat=num_args):
                 option_name = self._create_type_combo_name(name, types)
                 option = make_behavior_option(
                     option_name,
@@ -187,7 +189,7 @@ class BehaviorEnv(BaseEnv):
         self._config_file = modify_config_file(
             os.path.join(igibson.root_path, CFG.behavior_config_file),
             CFG.behavior_task_list[task_index], self.scene_list[task_num],
-            False)
+            False, CFG.seed)
 
     def get_random_scene_for_task(self, behavior_task_name: str,
                                   rng: Generator) -> str:
@@ -332,16 +334,7 @@ class BehaviorEnv(BaseEnv):
     @property
     def predicates(self) -> Set[Predicate]:
         predicates = set()
-        types_lst = sorted(self.types)  # for determinism
-
-        # Get the types of all objects in this particular problem.
-        curr_problem_type_names = set()
-        for ig_obj in self._get_task_relevant_objects():
-            curr_problem_type_names.add(ig_obj.category)
-        pruned_types_lst = []
-        for obj_type in types_lst:
-            if obj_type.name in curr_problem_type_names:
-                pruned_types_lst.append(obj_type)
+        pruned_types_lst = sorted(self.task_relevant_types)  # for determinism
 
         # First, extract predicates from iGibson
         for bddl_name in [
@@ -433,6 +426,20 @@ class BehaviorEnv(BaseEnv):
             self._type_name_to_type[type_name] = obj_type
 
         return set(self._type_name_to_type.values())
+
+    @property
+    def task_relevant_types(self) -> Set[Type]:
+        """Gets a subset of types that are relevant to this particular
+        BEHAVIOR problem."""
+        # Get the types of all objects in this particular problem.
+        curr_problem_type_names = set()
+        for ig_obj in self._get_task_relevant_objects():
+            curr_problem_type_names.add(ig_obj.category)
+        pruned_types = set()
+        for obj_type in self.types:
+            if obj_type.name in curr_problem_type_names:
+                pruned_types.add(obj_type)
+        return pruned_types
 
     @property
     def options(self) -> Set[ParameterizedOption]:
