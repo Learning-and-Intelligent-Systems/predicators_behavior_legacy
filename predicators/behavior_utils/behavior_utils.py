@@ -499,7 +499,7 @@ def load_checkpoint_state(s: State,
         load_checkpoint(env.igibson_behavior_env.simulator,
                         checkpoint_file_str, frame_num)
     except p.error as _:
-        logging.info(os.listdir(checkpoint_file_str))
+        print(f"tmp_behavior_states_dir: {os.listdir(checkpoint_file_str)}")
         raise ValueError(
             f"Could not load pybullet state for {checkpoint_file_str}, " +
             f"frame {frame_num}")
