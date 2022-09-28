@@ -11,6 +11,8 @@ import matplotlib
 import numpy as np
 from numpy.random._generator import Generator
 
+from predicators import envs
+
 try:
     import bddl
     import igibson
@@ -53,6 +55,8 @@ from predicators.settings import CFG
 from predicators.structs import Action, Array, GroundAtom, Object, \
     ParameterizedOption, Predicate, State, Task, Type, Video
 
+# Very Descriptive Comment
+igibson_behavior_env = None
 
 class BehaviorEnv(BaseEnv):
     """BEHAVIOR (iGibson) environment."""
@@ -94,7 +98,7 @@ class BehaviorEnv(BaseEnv):
                 int(self._rng.integers(0, len(CFG.behavior_task_list)))
                 for _ in range(CFG.num_train_tasks + CFG.num_test_tasks)
             ]
-            self.scene_list = [
+            CFG.behavior_scene_list = [
                 self.get_random_scene_for_task(CFG.behavior_task_list[i],
                                                self._rng)
                 for i in self.task_list_indices
@@ -186,8 +190,8 @@ class BehaviorEnv(BaseEnv):
         task_index = self.task_list_indices[task_num]
         self._config_file = modify_config_file(
             os.path.join(igibson.root_path, CFG.behavior_config_file),
-            CFG.behavior_task_list[task_index], self.scene_list[task_num],
-            False)
+            CFG.behavior_task_list[task_index],
+            CFG.behavior_scene_list[task_num], False)
 
     def get_random_scene_for_task(self, behavior_task_name: str,
                                   rng: Generator) -> str:
@@ -198,6 +202,9 @@ class BehaviorEnv(BaseEnv):
     def get_name(cls) -> str:
         return "behavior"
 
+    def get_igibson_behavior_env(self) -> "behavior_env.BehaviorEnv":
+        return igibson_behavior_env
+
     def simulate(self, state: State, action: Action) -> State:
         assert isinstance(state.simulator_state, str)
         self.task_num = int(state.simulator_state.split("-")[0])
@@ -205,7 +212,7 @@ class BehaviorEnv(BaseEnv):
         load_checkpoint_state(state, self, reset=True)
 
         a = action.arr
-        self.igibson_behavior_env.step(a)
+        igibson_behavior_env.step(a)
         # a[16] is used to indicate whether to grasp or release the currently-
         # held object. 1.0 indicates that the object should be grasped, and
         # -1.0 indicates it should be released
@@ -216,18 +223,18 @@ class BehaviorEnv(BaseEnv):
             # whether to close the hand or not (1.0 indicates that the
             # hand should be closed)
             assisted_grasp_action[26] = 1.0
-            _ = (self.igibson_behavior_env.robots[0].parts["right_hand"].
+            _ = (igibson_behavior_env.robots[0].parts["right_hand"].
                  handle_assisted_grasping(assisted_grasp_action))
         elif a[16] == -1.0:
-            obj_in_hand_idx = self.igibson_behavior_env.robots[0].parts[
+            obj_in_hand_idx = igibson_behavior_env.robots[0].parts[
                 "right_hand"].object_in_hand
             released_obj = [
-                obj for obj in self.igibson_behavior_env.scene.get_objects()
+                obj for obj in igibson_behavior_env.scene.get_objects()
                 if obj.get_body_id() == obj_in_hand_idx
             ][0]
             # force release object to avoid dealing with stateful assisted
             # grasping release mechanism
-            self.igibson_behavior_env.robots[0].parts[
+            igibson_behavior_env.robots[0].parts[
                 "right_hand"].force_release_obj()
             # reset the released object to zero velocity
             pyb.resetBaseVelocity(
@@ -271,11 +278,12 @@ class BehaviorEnv(BaseEnv):
                     task_instance_id=self.task_instance_id,
                     seed=curr_env_seed)
                 self.set_options()
-            self.igibson_behavior_env.reset()
+            igibson_behavior_env.reset()
             self.task_num_task_instance_id_to_igibson_seed[(
                 self.task_num, self.task_instance_id)] = curr_env_seed
             behavior_task_name = CFG.behavior_task_list[0] if len(
-                CFG.behavior_task_list) == 1 else "all"
+                CFG.behavior_task_list) == 1 else hash(
+                    frozenset(CFG.behavior_task_list))
             os.makedirs(f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
                         f"{behavior_task_name}__{CFG.num_train_tasks}__" +
                         f"{CFG.seed}__{self.task_num}__" +
@@ -299,8 +307,8 @@ class BehaviorEnv(BaseEnv):
         # ground atoms (this is also assumed by the planner).
         goal = set()
         assert len(
-            self.igibson_behavior_env.task.ground_goal_state_options) == 1
-        for head_expr in self.igibson_behavior_env.task.\
+            igibson_behavior_env.task.ground_goal_state_options) == 1
+        for head_expr in igibson_behavior_env.task.\
             ground_goal_state_options[0]:
             # BDDL expresses negative goals (such as 'not open').
             # Since our implementation of SeSamE assumes positive preconditions
@@ -439,10 +447,10 @@ class BehaviorEnv(BaseEnv):
     @property
     def action_space(self) -> Box:
         # 17-dimensional, between -1 and 1
-        assert self.igibson_behavior_env.action_space.shape == (17, )
-        assert np.all(self.igibson_behavior_env.action_space.low == -1)
-        assert np.all(self.igibson_behavior_env.action_space.high == 1)
-        return self.igibson_behavior_env.action_space
+        assert igibson_behavior_env.action_space.shape == (17, )
+        assert np.all(igibson_behavior_env.action_space.low == -1)
+        assert np.all(igibson_behavior_env.action_space.high == 1)
+        return igibson_behavior_env.action_space
 
     def render_state_plt(
             self,
@@ -461,7 +469,7 @@ class BehaviorEnv(BaseEnv):
                         "behavior_mode in settings.py instead")
 
     def _get_task_relevant_objects(self) -> List["ArticulatedObject"]:
-        return list(self.igibson_behavior_env.task.object_scope.values())
+        return list(igibson_behavior_env.task.object_scope.values())
 
     def set_igibson_behavior_env(self, task_num: int, task_instance_id: int,
                                  seed: int) -> None:
@@ -475,7 +483,8 @@ class BehaviorEnv(BaseEnv):
         while True:
             if len(CFG.behavior_task_list) != 1:
                 self.set_config_by_task_num(task_num)
-            self.igibson_behavior_env = behavior_env.BehaviorEnv(
+            global igibson_behavior_env
+            igibson_behavior_env = behavior_env.BehaviorEnv(
                 config_file=self._config_file,
                 mode=CFG.behavior_mode,
                 action_timestep=CFG.behavior_action_timestep,
@@ -484,8 +493,8 @@ class BehaviorEnv(BaseEnv):
                 instance_id=task_instance_id,
                 rng=self._rng,
             )
-            self.igibson_behavior_env.step(
-                np.zeros(self.igibson_behavior_env.action_space.shape))
+            igibson_behavior_env.step(
+                np.zeros(igibson_behavior_env.action_space.shape))
             ig_objs_bddl_scope = [
                 self._ig_object_name(obj)
                 for obj in self._get_task_relevant_objects()
@@ -498,8 +507,8 @@ class BehaviorEnv(BaseEnv):
             raise RuntimeError("ERROR: Failed to sample iGibson BEHAVIOR "
                                "environment that meets bddl initial "
                                "conditions!")
-        self.igibson_behavior_env.robots[0].initial_z_offset = 0.7
-        self.igibson_behavior_env.use_rrt = CFG.behavior_option_model_rrt
+        igibson_behavior_env.robots[0].initial_z_offset = 0.7
+        igibson_behavior_env.use_rrt = CFG.behavior_option_model_rrt
 
     # Do not add @functools.lru_cache(maxsize=None) here this will
     # lead to wrong mappings when we load a different scene
@@ -561,9 +570,10 @@ class BehaviorEnv(BaseEnv):
         simulator_state = None
         if save_state:
             behavior_task_name = CFG.behavior_task_list[0] if len(
-                CFG.behavior_task_list) == 1 else "all"
+                CFG.behavior_task_list) == 1 else hash(
+                    frozenset(CFG.behavior_task_list))
             simulator_state = save_checkpoint(
-                self.igibson_behavior_env.simulator,
+                igibson_behavior_env.simulator,
                 f"tmp_behavior_states/{CFG.behavior_scene_name}__" +
                 f"{behavior_task_name}__{CFG.num_train_tasks}__" +
                 f"{CFG.seed}__{self.task_num}__" + f"{self.task_instance_id}/")
@@ -577,6 +587,10 @@ class BehaviorEnv(BaseEnv):
     ) -> Callable[[State, Sequence[Object]], bool]:
 
         def _classifier(s: State, o: Sequence[Object]) -> bool:
+            # TODO make bddl_predicates a global varibale (get and set it)
+            # Then classifers should be picklable.
+
+
             # Behavior's predicates store the current object states
             # internally and use them to classify groundings of the
             # predicate. Because of this, we will assert that whenever
@@ -592,7 +606,7 @@ class BehaviorEnv(BaseEnv):
                 ig_obj = self.object_to_ig_object(o[0])
                 bddl_ground_atom = bddl_predicate.STATE_CLASS(ig_obj)
                 bddl_ground_atom.initialize(
-                    self.igibson_behavior_env.simulator)
+                    igibson_behavior_env.simulator)
                 return bddl_ground_atom.get_value()
             if arity == 2:
                 assert len(o) == 2
@@ -600,7 +614,7 @@ class BehaviorEnv(BaseEnv):
                 other_ig_obj = self.object_to_ig_object(o[1])
                 bddl_partial_ground_atom = bddl_predicate.STATE_CLASS(ig_obj)
                 bddl_partial_ground_atom.initialize(
-                    self.igibson_behavior_env.simulator)
+                    igibson_behavior_env.simulator)
                 return bddl_partial_ground_atom.get_value(other_ig_obj)
 
             raise ValueError("BDDL predicate has unexpected arity.")
@@ -616,8 +630,8 @@ class BehaviorEnv(BaseEnv):
         ig_obj = self.object_to_ig_object(objs[0])
         # We assume we're running BEHAVIOR with only 1 agent
         # in the scene.
-        assert len(self.igibson_behavior_env.robots) == 1
-        robot_obj = self.igibson_behavior_env.robots[0]
+        assert len(igibson_behavior_env.robots) == 1
+        robot_obj = igibson_behavior_env.robots[0]
         # If the two objects are the same (i.e reachable(agent, agent)),
         # we always want to return False so that when we learn
         # operators, such predicates don't needlessly appear in preconditions.
@@ -654,7 +668,7 @@ class BehaviorEnv(BaseEnv):
                 # first body in the list as the sofa's obj body
                 ig_obj.body_id = ig_obj.body_id[0]
 
-            if np.any(self.igibson_behavior_env.robots[0].is_grasping(
+            if np.any(igibson_behavior_env.robots[0].is_grasping(
                     ig_obj.body_id)):
                 grasped_objs.add(obj)
 
@@ -758,11 +772,14 @@ def make_behavior_option(
         assert memory.get("policy_controller") is not None
         assert not memory["has_terminated"]
         action_arr, memory["has_terminated"] = memory["policy_controller"](
-            state, env.igibson_behavior_env)
+            state, igibson_behavior_env)
         return Action(action_arr)
 
     def initiable(state: State, memory: Dict, objects: Sequence[Object],
                   params: Array) -> bool:
+        from predicators.envs import get_or_create_env
+        env =  get_or_create_env("behavior")
+        assert isinstance(env, BehaviorEnv)
         igo = [object_to_ig_object(o) for o in objects]
         assert len(igo) == 1
 
@@ -780,7 +797,7 @@ def make_behavior_option(
         # NOTE: the below type ignore comment is necessary because mypy
         # doesn't like that rng is being passed by keyword (seems to be
         # an issue with mypy: https://github.com/python/mypy/issues/1655)
-        planner_result = planner_fn(env.igibson_behavior_env,
+        planner_result = planner_fn(igibson_behavior_env,
                                     igo[0],
                                     params,
                                     rng=rng)  # type: ignore

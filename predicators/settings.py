@@ -509,15 +509,7 @@ class GlobalSettings:
                 {
                     # For the tools environment, keep it much lower.
                     "tools": 1,
-                })[args.get("env", "")],
-
-            # Used to save NSRTs as strings in pickle file.
-            dump_nsrts_as_strings=defaultdict(
-                lambda: False,
-                {
-                    # We cannot pickle BEHAVIOR NSRTs
-                    "behavior": True,
-                })[args.get("env", "")],
+                })[args.get("env", "")]
         )
 
 

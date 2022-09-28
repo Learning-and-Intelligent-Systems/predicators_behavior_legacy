@@ -154,10 +154,20 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                                   sampler_learner=CFG.sampler_learner)
         save_path = utils.get_approach_save_path_str()
         with open(f"{save_path}_{online_learning_cycle}.NSRTs", "wb") as f:
-            if CFG.dump_nsrts_as_strings:
-                pkl.dump(str(self._nsrts), f)
-            else:
+            try:
                 pkl.dump(self._nsrts, f)
+            except:
+                env = get_or_create_env("behavior")
+                for key, val in env.__dict__.items():
+                    print(key, val)
+                    if str(key) == "_train_tasks":
+                        for key1, val1 in list(val[0].goal)[0].__dict__.items():
+                            print(key1, val1)
+                            try:
+                                pkl.dump((key1, val1), f)
+                            except:
+                                import ipdb; ipdb.set_trace()
+
         if CFG.compute_sidelining_objective_value:
             self._compute_sidelining_objective_value(trajectories)
 
