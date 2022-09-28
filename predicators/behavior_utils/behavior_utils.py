@@ -1,7 +1,9 @@
 """Utility functions for using iGibson and BEHAVIOR."""
 
+import logging
 from typing import List, Optional, Sequence, Tuple, Union
 
+import os
 import numpy as np
 import pybullet as p
 
@@ -497,6 +499,7 @@ def load_checkpoint_state(s: State,
         load_checkpoint(env.igibson_behavior_env.simulator,
                         checkpoint_file_str, frame_num)
     except p.error as _:
+        logging.info(os.listdir(checkpoint_file_str))
         raise ValueError(
             f"Could not load pybullet state for {checkpoint_file_str}, " +
             f"frame {frame_num}")
