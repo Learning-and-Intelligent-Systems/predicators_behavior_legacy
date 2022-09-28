@@ -1,9 +1,8 @@
 """Utility functions for using iGibson and BEHAVIOR."""
 
-import logging
+import os
 from typing import List, Optional, Sequence, Tuple, Union
 
-import os
 import numpy as np
 import pybullet as p
 

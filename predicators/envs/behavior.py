@@ -426,10 +426,6 @@ class BehaviorEnv(BaseEnv):
 
         return set(self._type_name_to_type.values())
 
-    # TODO: we need a method called self.task_relevant_types
-    # that only returns types that are necessary for the task at hand.
-    # This needs to be used in the creation of both predicates and
-    # options!!!
     @property
     def task_relevant_types(self) -> Set[Type]:
         # Get the types of all objects in this particular problem.
