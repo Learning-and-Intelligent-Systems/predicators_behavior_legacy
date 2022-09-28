@@ -189,7 +189,7 @@ class BehaviorEnv(BaseEnv):
         self._config_file = modify_config_file(
             os.path.join(igibson.root_path, CFG.behavior_config_file),
             CFG.behavior_task_list[task_index], self.scene_list[task_num],
-            False)
+            False, CFG.seed)
 
     def get_random_scene_for_task(self, behavior_task_name: str,
                                   rng: Generator) -> str:
