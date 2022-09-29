@@ -774,7 +774,7 @@ def make_behavior_option(
             get_or_create_env  # pylint: disable=import-outside-toplevel
         env = get_or_create_env("behavior")
         assert isinstance(env, BehaviorEnv)
-        
+
         assert "has_terminated" in memory
         # must call initiable() first, and it must return True
         assert memory.get("policy_controller") is not None
