@@ -2759,7 +2759,7 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
     # such that all types could inherit from 'object' we would not need
     # to perform this combinatorial enumeration.
 
-    type_name_to_type = {t.name: t for t in env.types}
+    type_name_to_type = {t.name: t for t in env.task_relevant_types}
     pred_name_to_pred = {p.name: p for p in env.predicates}
 
     def _get_lifted_atom(base_pred_name: str,
