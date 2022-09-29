@@ -55,7 +55,7 @@ from predicators.structs import Action, Array, GroundAtom, Object, \
 
 # This is the iGibson Environment from the BEHAVIOR repo that our BehaviorEnv
 # wrapper class, uses for low-level simulation (i.e. step, load_states, etc.)
-igibson_behavior_env = None
+igibson_behavior_env: "behavior_env.BehaviorEnv" = None
 
 
 class BehaviorEnv(BaseEnv):
@@ -173,11 +173,9 @@ class BehaviorEnv(BaseEnv):
                     types=list(types),
                     params_space=Box(parameter_limits[0], parameter_limits[1],
                                      (param_dim, )),
-                    env=self,
                     planner_fn=planner_fn,
                     policy_fn=policy_fn,
                     option_model_fn=option_model_fn,
-                    object_to_ig_object=self.object_to_ig_object,
                     rng=self._rng,
                 )
                 self._options.add(option)
@@ -205,6 +203,7 @@ class BehaviorEnv(BaseEnv):
         return "behavior"
 
     def get_igibson_behavior_env(self) -> "behavior_env.BehaviorEnv":
+        """A method that gets the current iGibson BEHAVIOR env."""
         return igibson_behavior_env
 
     def simulate(self, state: State, action: Action) -> State:
@@ -760,7 +759,7 @@ class BehaviorEnv(BaseEnv):
 
 
 def make_behavior_option(
-        name: str, types: Sequence[Type], params_space: Box, env: BehaviorEnv,
+        name: str, types: Sequence[Type], params_space: Box,
         planner_fn: Callable[[
             "behavior_env.BehaviorEnv", Union[
                 "URDFObject", "RoomFloor"], Array, Optional[Generator]
@@ -770,9 +769,8 @@ def make_behavior_option(
                                      Tuple[Array, bool]]],
         option_model_fn: Callable[
             [List[List[float]], List[List[float]], "URDFObject"],
-            Callable[[State, "behavior_env.BehaviorEnv"], None]],
-        object_to_ig_object: Callable[[Object], "ArticulatedObject"],
-        rng: Generator) -> ParameterizedOption:
+            Callable[[State, "behavior_env.BehaviorEnv"],
+                     None]], rng: Generator) -> ParameterizedOption:
     """Makes an option for a BEHAVIOR env using custom implemented
     controller_fn."""
 
