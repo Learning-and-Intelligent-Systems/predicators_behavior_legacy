@@ -185,15 +185,17 @@ class NSRTLearningApproach(BilevelPlanningApproach):
     def load(self, online_learning_cycle: Optional[int]) -> None:
         save_path = utils.get_approach_load_path_str()
         with open(f"{save_path}_{online_learning_cycle}.NSRTs", "rb") as f:
-            string_nsrts = pkl.load(f)
-        if CFG.env == "behavior":
-            assert isinstance(string_nsrts, str)
-            with open(f"{save_path}_{online_learning_cycle}.SAMPLERs",
-                      "rb") as f:
-                sampler_name_to_sampler = pkl.load(f)
-            # Implement string_nsrts to _nsrts
-            self._nsrts = self.parse_nsrts_string(string_nsrts,
-                                                  sampler_name_to_sampler)
+            if CFG.dump_nsrts_as_strings:  # pragma: no cover
+                string_nsrts = pkl.load(f)
+                assert isinstance(string_nsrts, str)
+                with open(f"{save_path}_{online_learning_cycle}.SAMPLERs",
+                          "rb") as f:
+                    sampler_name_to_sampler = pkl.load(f)
+                # Implement string_nsrts to _nsrts
+                self._nsrts = self.parse_nsrts_string(string_nsrts,
+                                                      sampler_name_to_sampler)
+            else:
+                self._nsrts = pkl.load(f)
         if CFG.pretty_print_when_loading:
             preds, _ = utils.extract_preds_and_types(self._nsrts)
             name_map = {}
