@@ -769,12 +769,18 @@ def make_behavior_option(
 
     def policy(state: State, memory: Dict, _objects: Sequence[Object],
                _params: Array) -> Action:
+        # Neccessary to make picklable.
+        from predicators.envs import \
+            get_or_create_env  # pylint: disable=import-outside-toplevel
+        env = get_or_create_env("behavior")
+        assert isinstance(env, BehaviorEnv)
+        
         assert "has_terminated" in memory
         # must call initiable() first, and it must return True
         assert memory.get("policy_controller") is not None
         assert not memory["has_terminated"]
         action_arr, memory["has_terminated"] = memory["policy_controller"](
-            state, self.igibson_behavior_env)
+            state, env.igibson_behavior_env)
         return Action(action_arr)
 
     def initiable(state: State, memory: Dict, objects: Sequence[Object],
@@ -802,7 +808,7 @@ def make_behavior_option(
         # NOTE: the below type ignore comment is necessary because mypy
         # doesn't like that rng is being passed by keyword (seems to be
         # an issue with mypy: https://github.com/python/mypy/issues/1655)
-        planner_result = planner_fn(self.igibson_behavior_env,
+        planner_result = planner_fn(env.igibson_behavior_env,
                                     igo[0],
                                     params,
                                     rng=rng)  # type: ignore
