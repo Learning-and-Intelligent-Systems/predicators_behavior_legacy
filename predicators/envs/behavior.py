@@ -110,11 +110,7 @@ class BehaviorEnv(BaseEnv):
                                                              int] = {}
         # Everytime we load a new scene in BEHAVIOR we also need to set
         # the valid options again, because there might be new type combos.
-        self.set_options()
-        # Create option_name_to_option once
-        self._option_name_to_option = {}
-        for opt in self._options:
-            self._option_name_to_option[opt.name] = opt
+        self.set_options()        
 
     def set_options(self) -> None:
         """Sets the underlying options for this particular task using the
@@ -435,6 +431,7 @@ class BehaviorEnv(BaseEnv):
         curr_problem_type_names = set()
         for ig_obj in self._get_task_relevant_objects():
             curr_problem_type_names.add(ig_obj.category)
+        
         pruned_types = set()
         for obj_type in self.types:
             if obj_type.name in curr_problem_type_names:
@@ -453,7 +450,10 @@ class BehaviorEnv(BaseEnv):
         Useful when loading BEHAVIOR trajectories (which will have dummy
         options) and resetting the options used in the trajectories.
         """
-        return self._option_name_to_option
+        option_name_to_option = {}
+        for opt in self._options:
+            option_name_to_option[opt.name] = opt
+        return option_name_to_option
 
     @property
     def action_space(self) -> Box:
