@@ -8,7 +8,7 @@ import logging
 import os
 import re
 import time
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Dict, List, Optional, Set
 
 import dill as pkl
 from gym.spaces import Box
@@ -294,7 +294,9 @@ class NSRTLearningApproach(BilevelPlanningApproach):
 
         for nsrt_string in nsrts_string.replace("{", "").replace(
                 "}", "").split("NSRT-")[1:]:
-            name, str_params, str_precond, str_add_effects, str_delete_effects, str_ignore_effects, option_spec = nsrt_string.split(
+            name, str_params, str_precond, str_add_effects, \
+                str_delete_effects, str_ignore_effects, \
+                option_spec = nsrt_string.split(
                 "\n    ")
             name = name.replace(":", "")
             params = [
