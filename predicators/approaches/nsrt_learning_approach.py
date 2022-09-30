@@ -51,7 +51,7 @@ class NSRTLearningApproach(BilevelPlanningApproach):
         return self._nsrts
 
     def _get_from_env_by_names_dict(self, env_name: str,
-                                    env_attr: str) -> Dict:
+                                    env_attr: str) -> Dict:  # pragma: no cover
         """Helper for getting dict to load types, predicates, and options by
         name."""
         env = get_or_create_env(env_name)
@@ -279,8 +279,9 @@ class NSRTLearningApproach(BilevelPlanningApproach):
                      f"complexity {complexity}")
 
     def parse_nsrts_string(
-            self, nsrts_string: str,
-            sampler_name_to_sampler: Dict[str, NSRTSampler]) -> Set[NSRT]:
+        self, nsrts_string: str, sampler_name_to_sampler: Dict[str,
+                                                               NSRTSampler]
+    ) -> Set[NSRT]:  # pragma: no cover
         """Parses BEHAVIOR NSRTs saved as strings by retrieving types,
         predicates, and options from the env and creating a set of NSRTS.
 
