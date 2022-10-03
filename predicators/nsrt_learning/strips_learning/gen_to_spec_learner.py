@@ -346,7 +346,7 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                                             key=str):
             pnads_with_keep_effects = set()
             for pnad in nec_pnad_list:
-                self._compute_pnad_add_effects(pnad)
+                self._compute_extra_add_effects(pnad)
                 self._compute_pnad_delete_effects(pnad)
                 self._compute_pnad_ignore_effects(pnad)
                 pnads_with_keep_effects |= self._get_pnads_with_keep_effects(
@@ -455,7 +455,7 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
         return new_pnad
 
     @staticmethod
-    def _compute_pnad_add_effects(pnad: PartialNSRTAndDatastore) -> None:
+    def _compute_extra_add_effects(pnad: PartialNSRTAndDatastore) -> None:
         """Update the given PNAD to have the add effects include _all_ effects
         that are consistently added in the pnad's datastore (regardless of
         whether they are necessary).
