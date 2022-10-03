@@ -248,10 +248,6 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                     nec_pnad_set_changed = True
                     pnad = self._spawn_new_pnad(segment)
                     param_opt_to_nec_pnads[option.parent].append(pnad)
-
-                    # if "PlaceInside-bucket" in pnad.op.name:
-                    #     import ipdb; ipdb.set_trace()
-
                     # Recompute datastores for ALL PNADs associated with this
                     # option. We need to do this because the new PNAD may now
                     # be a better match for some transition that we previously
@@ -350,8 +346,6 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                                             key=str):
             pnads_with_keep_effects = set()
             for pnad in nec_pnad_list:
-                if "PlaceInside-bucket" in pnad.op.name:
-                    import ipdb; ipdb.set_trace()
                 self._compute_pnad_add_effects(pnad)
                 self._compute_pnad_delete_effects(pnad)
                 self._compute_pnad_ignore_effects(pnad)
@@ -462,36 +456,45 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
 
     @staticmethod
     def _compute_pnad_add_effects(pnad: PartialNSRTAndDatastore) -> None:
-        """Update the given PNAD to have the add effects include _all_
-        effects that are consistently added in the pnad's datastore
-        (regardless of whether they are necessary).
+        """Update the given PNAD to have the add effects include _all_ effects
+        that are consistently added in the pnad's datastore (regardless of
+        whether they are necessary).
 
         IMPORTANT NOTE: We do not allow creating new variables when we
-        create these add effects. Instead, we filter out add effects that
-        include new variables. What this method is overall doing is just
-        adding in 'unnecessary' add effects that co-occur with necessary
-        add effects that we should have already induced.
+        create these add effects. Instead, we filter out add effects
+        that include new variables. What this method is overall doing is
+        just adding in 'unnecessary' add effects that co-occur with
+        necessary add effects that we should have already induced.
         """
         op_without_ignore = pnad.op.copy_with(ignore_effects=set())
         new_add_effects = set()
         i = 0
         for segment, var_to_obj in pnad.datastore:
-            objs = tuple(var_to_obj[param] for param in op_without_ignore.parameters)
+            objs = tuple(var_to_obj[param]
+                         for param in op_without_ignore.parameters)
             ground_op = op_without_ignore.ground(objs)
             next_atoms = utils.apply_operator(ground_op, segment.init_atoms)
             obj_to_var = {o: v for v, o in var_to_obj.items()}
-            unmodeled_add_effects = segment.final_atoms - next_atoms
-            potential_add_effects = {atom for atom in unmodeled_add_effects if all(o in obj_to_var for o in atom.objects)}
-            if len(potential_add_effects) == 0:
-                continue
-            lifted_potential_add_effects = {atom.lift(obj_to_var) for atom in potential_add_effects}
+            unmodeled_add_effects = segment.add_effects - (next_atoms -
+                                                           segment.init_atoms)
+            potential_add_effects = {
+                atom
+                for atom in unmodeled_add_effects
+                if all(o in obj_to_var for o in atom.objects)
+            }
+            lifted_potential_add_effects = {
+                atom.lift(obj_to_var)
+                for atom in potential_add_effects
+            }
             if i == 0:
                 new_add_effects = lifted_potential_add_effects
             else:
                 new_add_effects &= lifted_potential_add_effects
             i += 1
-        pnad.op = pnad.op.copy_with(add_effects=pnad.op.add_effects | new_add_effects)
-    
+
+        pnad.op = pnad.op.copy_with(add_effects=pnad.op.add_effects
+                                    | new_add_effects)
+
     @staticmethod
     def _compute_pnad_delete_effects(pnad: PartialNSRTAndDatastore) -> None:
         """Update the given PNAD to change the delete effects to ones obtained
