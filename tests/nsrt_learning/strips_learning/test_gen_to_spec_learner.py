@@ -1378,9 +1378,9 @@ def test_backchaining_segment_not_in_datastore():
         """STRIPS-Pick:
     Parameters: []
     Preconditions: [C(), E()]
-    Add Effects: [B()]
+    Add Effects: [A(), B(), D()]
     Delete Effects: []
-    Ignore Effects: [A, D]
+    Ignore Effects: []
     Option Spec: Pick()""", """STRIPS-Pick:
     Parameters: []
     Preconditions: [B(), D(), E()]
@@ -1390,15 +1390,15 @@ def test_backchaining_segment_not_in_datastore():
     Option Spec: Pick()""", """STRIPS-Pick:
     Parameters: []
     Preconditions: [A(), C(), D()]
-    Add Effects: [A(), B(), D()]
+    Add Effects: [A(), B(), D(), E()]
     Delete Effects: [C()]
-    Ignore Effects: [E]
+    Ignore Effects: []
     Option Spec: Pick()""", """STRIPS-Pick:
     Parameters: []
     Preconditions: [A(), D()]
-    Add Effects: [A(), B()]
+    Add Effects: [A(), B(), E()]
     Delete Effects: [D()]
-    Ignore Effects: [E]
+    Ignore Effects: []
     Option Spec: Pick()""", """STRIPS-Pick:
     Parameters: []
     Preconditions: [A(), B(), D()]
@@ -1407,9 +1407,6 @@ def test_backchaining_segment_not_in_datastore():
     Ignore Effects: []
     Option Spec: Pick()"""
     ]
-
-    import ipdb
-    ipdb.set_trace()
     for pnad in learned_pnads:
         # Rename the output PNADs to standardize naming
         # and make comparison easier.
