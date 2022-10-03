@@ -1302,6 +1302,8 @@ def test_multi_pass_backchaining(val):
     Option Spec: Place()"""
         ]
 
+    import ipdb; ipdb.set_trace()
+
     for pnad in learned_pnads:
         # Rename the output PNADs to standardize naming
         # and make comparison easier.
@@ -1407,6 +1409,8 @@ def test_backchaining_segment_not_in_datastore():
     Ignore Effects: []
     Option Spec: Pick()"""
     ]
+
+    import ipdb; ipdb.set_trace()
     for pnad in learned_pnads:
         # Rename the output PNADs to standardize naming
         # and make comparison easier.
