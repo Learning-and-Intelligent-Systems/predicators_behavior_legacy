@@ -248,6 +248,7 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                     nec_pnad_set_changed = True
                     pnad = self._spawn_new_pnad(segment)
                     param_opt_to_nec_pnads[option.parent].append(pnad)
+
                     # Recompute datastores for ALL PNADs associated with this
                     # option. We need to do this because the new PNAD may now
                     # be a better match for some transition that we previously
@@ -468,8 +469,7 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
         """
         op_without_ignore = pnad.op.copy_with(ignore_effects=set())
         new_add_effects = set()
-        i = 0
-        for segment, var_to_obj in pnad.datastore:
+        for i, (segment, var_to_obj) in enumerate(pnad.datastore):
             objs = tuple(var_to_obj[param]
                          for param in op_without_ignore.parameters)
             ground_op = op_without_ignore.ground(objs)
@@ -490,7 +490,6 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                 new_add_effects = lifted_potential_add_effects
             else:
                 new_add_effects &= lifted_potential_add_effects
-            i += 1
 
         pnad.op = pnad.op.copy_with(add_effects=pnad.op.add_effects
                                     | new_add_effects)
