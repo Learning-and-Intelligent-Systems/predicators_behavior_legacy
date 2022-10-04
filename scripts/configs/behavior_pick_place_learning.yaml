@@ -18,7 +18,7 @@ APPROACHES:
       plan_only_eval: True
       sesame_task_planner: fdopt
 ENVS:
-  collecting-alluminum-cans-Ihlen_1_int:
+  collecting-aluminum-cans-Ihlen_1_int:
     NAME: "behavior"
     FLAGS:
       behavior_scene_name: Ihlen_1_int
