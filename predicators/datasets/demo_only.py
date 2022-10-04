@@ -180,8 +180,18 @@ def _generate_demonstrations(
         event_to_action = env.get_event_to_action_fn()
     trajectories = []
     num_tasks = min(len(train_tasks), CFG.max_initial_demos)
-    for idx, task in enumerate(train_tasks):
+    # This will loop until we create a demo trajectory for each task or
+    # until we exceed maximum number of attempts. The default number of
+    # max_num_attempts is 5x the number of tasks we are trying to create
+    # demonstrations for.
+    attempts = 0
+    idx = 0
+    max_num_attempts = 5 * num_tasks
+    while idx < num_tasks and attempts < max_num_attempts:
+        attempts += 1
+        task = train_tasks[idx]
         if idx < train_tasks_start_idx:  # ignore demos before this index
+            idx += 1
             continue
         # Note: we assume in main.py that demonstrations are only generated
         # for train tasks whose index is less than CFG.max_initial_demos. If
@@ -268,11 +278,14 @@ def _generate_demonstrations(
                     assert CFG.option_learner != "no_learning"
                     act.unset_option()
         trajectories.append(traj)
+        idx += 1
         if CFG.make_demo_videos:
             assert monitor is not None
             video = monitor.get_video()
             outfile = f"{CFG.env}__{CFG.seed}__demo__task{idx}.mp4"
             utils.save_video(outfile, video)
+    # This asserts that we generated the proper number of demonstrations.
+    assert len(trajectories) == (num_tasks - train_tasks_start_idx)
     return trajectories
 
 
