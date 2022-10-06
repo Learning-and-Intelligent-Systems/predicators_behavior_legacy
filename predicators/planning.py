@@ -72,7 +72,7 @@ def sesame_plan(
     only consider at most one skeleton, and DiscoveredFailures cannot be
     handled.
     """
-    if CFG.env == "behavior" and CFG.behavior_mode == 'iggui':
+    if CFG.env == "behavior" and CFG.behavior_mode == 'iggui':  # pragma: no cover
         logging.info(  # pylint: disable=logging-not-lazy
             "VIDEO CREATION MODE: You have 30 seconds to position " +
             "the iggui window to the location you want for recording.")
