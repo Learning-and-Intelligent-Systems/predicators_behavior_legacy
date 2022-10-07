@@ -247,6 +247,7 @@ def create_place_inside_option_model(
                     # simulator to let the object fall into its place
                     for _ in range(15):
                         env.step(np.zeros(env.action_space.shape))
+                    import ipdb; ipdb.set_trace()
                 else:
                     logging.info(
                         f"PRIMITIVE: place {obj_in_hand.name} inside "
