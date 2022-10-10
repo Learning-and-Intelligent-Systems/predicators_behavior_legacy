@@ -3006,24 +3006,6 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                     rng.uniform(objB_sampling_bounds[2] + 0.15,
                                 objB_sampling_bounds[2] + 0.5)
                 ])
-                # Note that these sample params assume that objA
-                # is exactly at the same position as the hand.
-                # Unfortunately, this is not true, so we have to
-                # correct for this discrepancy.
-                hand_pos = np.array(env.igibson_behavior_env.robots[0].parts["right_hand"].get_position())
-                objA_pos = np.array(objA.get_position())
-                obj_hand_offset = objA_pos - hand_pos
-                old_sample_params = sample_params + obj_hand_offset
-
-                # Transform Sample to World Frame
-                new_position, _ = p.multiplyTransforms(
-                    objB.get_position(),
-                    objB.get_orientation(),
-                    old_sample_params,
-                    (0, 0, -1, 0),
-                )
-                sample_params = tuple(np.array(new_position) - np.array(objB.get_position()))
-                import ipdb; ipdb.set_trace()
                 return sample_params
 
             if objB.category == "trash_can":

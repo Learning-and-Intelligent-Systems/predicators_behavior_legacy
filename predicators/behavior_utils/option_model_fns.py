@@ -57,7 +57,7 @@ def create_grasp_option_model(
 
     def graspObjectOptionModel(_state: State, env: "BehaviorEnv") -> None:
         nonlocal hand_i
-        rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
+        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
         )
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
 
@@ -91,7 +91,7 @@ def create_grasp_option_model(
 
         # 4 Move Hand to Original Location
         env.robots[0].parts["right_hand"].set_position_orientation(
-            rh_orig_grasp_postion, rh_orig_grasp_orn)
+            rh_orig_grasp_position, rh_orig_grasp_orn)
         if env.robots[0].parts["right_hand"].object_in_hand is not None:
             # NOTE: This below line is necessary to update the visualizer.
             # Also, it only works for URDF objects (but if the object is
@@ -114,7 +114,7 @@ def create_place_option_model(
     def placeOntopObjectOptionModel(_init_state: State,
                                     env: "BehaviorEnv") -> None:
         released_obj_bid = env.robots[0].parts["right_hand"].object_in_hand
-        rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
+        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
         )
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
         target_pos = plan[-1][0:3]
@@ -133,7 +133,7 @@ def create_place_option_model(
             angularVelocity=[0, 0, 0],
         )
         env.robots[0].parts["right_hand"].set_position_orientation(
-            rh_orig_grasp_postion, rh_orig_grasp_orn)
+            rh_orig_grasp_position, rh_orig_grasp_orn)
         # this is running a series of zero action to step simulator
         # to let the object fall into its place
         for _ in range(15):
@@ -206,7 +206,7 @@ def create_place_inside_option_model(
             obj for obj in env.scene.get_objects()
             if obj.get_body_id() == obj_in_hand_idx
         ][0]
-        rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
+        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
         )
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
         if obj_in_hand is not None and obj_in_hand != obj_to_place_into and \
@@ -227,10 +227,13 @@ def create_place_inside_option_model(
                                  f"{obj_to_place_into.name} success")
                     target_pos = plan[-1][0:3]
                     target_orn = plan[-1][3:6]
-                    env.robots[0].parts["right_hand"].set_position_orientation(
-                        target_pos, p.getQuaternionFromEuler(target_orn))
+                    # env.robots[0].parts["right_hand"].set_position_orientation(
+                    #     target_pos, p.getQuaternionFromEuler(target_orn))
+
                     env.robots[0].parts["right_hand"].force_release_obj()
                     obj_to_place_into.force_wakeup()
+                    obj_in_hand.set_position_orientation(target_pos, p.getQuaternionFromEuler(target_orn))
+
                     # this is running a zero action to step simulator
                     env.step(np.zeros(env.action_space.shape))
                     # reset the released object to zero velocity so it
@@ -242,12 +245,11 @@ def create_place_inside_option_model(
                         angularVelocity=[0, 0, 0],
                     )
                     env.robots[0].parts["right_hand"].set_position_orientation(
-                        rh_orig_grasp_postion, rh_orig_grasp_orn)
+                        rh_orig_grasp_position, rh_orig_grasp_orn)
                     # this is running a series of zero action to step
                     # simulator to let the object fall into its place
                     for _ in range(15):
-                        env.step(np.zeros(env.action_space.shape))
-                    import ipdb; ipdb.set_trace()
+                        env.step(np.zeros(env.action_space.shape))                    
                 else:
                     logging.info(
                         f"PRIMITIVE: place {obj_in_hand.name} inside "
