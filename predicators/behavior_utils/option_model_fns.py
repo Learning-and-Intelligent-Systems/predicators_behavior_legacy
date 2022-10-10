@@ -57,8 +57,8 @@ def create_grasp_option_model(
 
     def graspObjectOptionModel(_state: State, env: "BehaviorEnv") -> None:
         nonlocal hand_i
-        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
-        )
+        rh_orig_grasp_position = env.robots[0].parts[
+            "right_hand"].get_position()
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
 
         # 1 Teleport Hand to Grasp offset location
@@ -118,15 +118,16 @@ def create_place_option_model(
             obj for obj in env.scene.get_objects()
             if obj.get_body_id() == obj_in_hand_idx
         ][0]
-        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
-        )
+        rh_orig_grasp_position = env.robots[0].parts[
+            "right_hand"].get_position()
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
         target_pos = plan[-1][0:3]
         target_orn = plan[-1][3:6]
         env.robots[0].parts["right_hand"].set_position_orientation(
             target_pos, p.getQuaternionFromEuler(target_orn))
         env.robots[0].parts["right_hand"].force_release_obj()
-        obj_in_hand.set_position_orientation(target_pos, p.getQuaternionFromEuler(target_orn))
+        obj_in_hand.set_position_orientation(
+            target_pos, p.getQuaternionFromEuler(target_orn))
         obj_to_place.force_wakeup()
         # this is running a zero action to step simulator
         env.step(np.zeros(env.action_space.shape))
@@ -211,8 +212,8 @@ def create_place_inside_option_model(
             obj for obj in env.scene.get_objects()
             if obj.get_body_id() == obj_in_hand_idx
         ][0]
-        rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
-        )
+        rh_orig_grasp_position = env.robots[0].parts[
+            "right_hand"].get_position()
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
         if obj_in_hand is not None and obj_in_hand != obj_to_place_into and \
             isinstance(obj_to_place_into, URDFObject):
@@ -232,12 +233,10 @@ def create_place_inside_option_model(
                                  f"{obj_to_place_into.name} success")
                     target_pos = plan[-1][0:3]
                     target_orn = plan[-1][3:6]
-                    # env.robots[0].parts["right_hand"].set_position_orientation(
-                    #     target_pos, p.getQuaternionFromEuler(target_orn))
-
                     env.robots[0].parts["right_hand"].force_release_obj()
                     obj_to_place_into.force_wakeup()
-                    obj_in_hand.set_position_orientation(target_pos, p.getQuaternionFromEuler(target_orn))
+                    obj_in_hand.set_position_orientation(
+                        target_pos, p.getQuaternionFromEuler(target_orn))
 
                     # this is running a zero action to step simulator
                     env.step(np.zeros(env.action_space.shape))
@@ -254,7 +253,7 @@ def create_place_inside_option_model(
                     # this is running a series of zero action to step
                     # simulator to let the object fall into its place
                     for _ in range(15):
-                        env.step(np.zeros(env.action_space.shape))                    
+                        env.step(np.zeros(env.action_space.shape))
                 else:
                     logging.info(
                         f"PRIMITIVE: place {obj_in_hand.name} inside "

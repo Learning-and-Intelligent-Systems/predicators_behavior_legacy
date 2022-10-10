@@ -6,7 +6,6 @@ from typing import List, Sequence, Set, Union, cast
 
 import numpy as np
 from numpy.random._generator import Generator
-import pybullet as p
 
 from predicators.behavior_utils.behavior_utils import OPENABLE_OBJECT_TYPES, \
     PICK_PLACE_OBJECT_TYPES, PLACE_INTO_SURFACE_OBJECT_TYPES, \
