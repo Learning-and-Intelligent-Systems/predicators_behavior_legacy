@@ -264,12 +264,6 @@ class BehaviorEnv(BaseEnv):
                     self.task_instance_id = rng.integers(10, 20)
                 else:
                     self.task_instance_id = rng.integers(0, 10)
-
-                # Overriding for testing purposes (remember to delete later!)
-                # self.task_num = 1
-                # self.task_instance_id = 17
-                # curr_env_seed = 2377310379
-
                 if len(CFG.behavior_task_list) != 1:
                     self.set_config_by_task_num(self.task_num)
                 self.set_igibson_behavior_env(
@@ -287,12 +281,6 @@ class BehaviorEnv(BaseEnv):
                         f"{CFG.seed}__{self.task_num}__" +
                         f"{self.task_instance_id}",
                         exist_ok=True)
-
-            print(f"Task Num: {self.task_num}")
-            print(f"Task ID: {self.task_instance_id}")
-            print(f"Curr Env Seed: {curr_env_seed}")
-            print()
-
             # NOTE: We load_checkpoint_state here because there appears to
             # be a subtle difference between calling the predicate classifiers
             # on a particular state, and calling them after loading checkpoint
