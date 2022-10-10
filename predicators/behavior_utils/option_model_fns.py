@@ -113,7 +113,11 @@ def create_place_option_model(
 
     def placeOntopObjectOptionModel(_init_state: State,
                                     env: "BehaviorEnv") -> None:
-        released_obj_bid = env.robots[0].parts["right_hand"].object_in_hand
+        obj_in_hand_idx = env.robots[0].parts["right_hand"].object_in_hand
+        obj_in_hand = [
+            obj for obj in env.scene.get_objects()
+            if obj.get_body_id() == obj_in_hand_idx
+        ][0]
         rh_orig_grasp_position = env.robots[0].parts["right_hand"].get_position(
         )
         rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
@@ -122,13 +126,14 @@ def create_place_option_model(
         env.robots[0].parts["right_hand"].set_position_orientation(
             target_pos, p.getQuaternionFromEuler(target_orn))
         env.robots[0].parts["right_hand"].force_release_obj()
+        obj_in_hand.set_position_orientation(target_pos, p.getQuaternionFromEuler(target_orn))
         obj_to_place.force_wakeup()
         # this is running a zero action to step simulator
         env.step(np.zeros(env.action_space.shape))
         # reset the released object to zero velocity so it doesn't
         # fly away because of residual warp speeds from teleportation!
         p.resetBaseVelocity(
-            released_obj_bid,
+            obj_in_hand_idx,
             linearVelocity=[0, 0, 0],
             angularVelocity=[0, 0, 0],
         )
