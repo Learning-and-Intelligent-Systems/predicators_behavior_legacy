@@ -3006,7 +3006,6 @@ def _get_behavior_gt_nsrts() -> Set[NSRT]:  # pragma: no cover
                                 objB_sampling_bounds[2] + 0.5)
                 ])
                 return sample_params
-
             if objB.category == "trash_can":
                 objB_sampling_bounds = objB.bounding_box / 2
                 # Since the trash can's hole is generally in the center,
