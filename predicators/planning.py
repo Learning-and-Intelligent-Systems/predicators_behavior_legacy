@@ -828,6 +828,10 @@ def _sesame_plan_with_fast_downward(
     metrics["num_nodes_created"] = float(num_nodes_created[0])
     # Extract the skeleton from the output and compute the atoms_sequence.
     if "Solution found!" not in output:
+        logging.info(f"Init Atoms: {init_atoms}")
+        logging.info(f"Task Goal: {task.goal}")
+        logging.info(f"Domain String: {dom_file}")
+        logging.info(f"Problem String: {prob_file}")
         raise PlanningFailure(f"Plan not found with FD! Error: {output}")
     if "Plan length: 0 step" in output:
         # Handle the special case where the plan is found to be trivial.
