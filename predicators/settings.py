@@ -120,6 +120,7 @@ class GlobalSettings:
     behavior_randomize_init_state = True
     behavior_option_model_eval = False
     behavior_option_model_rrt = False
+    behavior_robot = "BehaviorRobot"  # BehaviorRobot, FetchGripper
 
     # general pybullet parameters
     pybullet_use_gui = False  # must be True to make videos
