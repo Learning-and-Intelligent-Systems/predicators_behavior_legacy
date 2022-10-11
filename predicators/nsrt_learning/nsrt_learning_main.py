@@ -57,6 +57,24 @@ def learn_nsrts_from_data(
             ]
             logging.info(f"Learning NSRTs on Ordering {order_i}/"
                          f"{CFG.data_orderings_to_search}")
+        ############ WARNING #################
+        traj_scores = []
+        for traj_i, ground_atom_traj in enumerate(ground_atom_dataset):
+            empty_transitions = 0
+            for i, seg in enumerate(ground_atom_traj[1]):
+                if i != 0:
+                    add_effects = ground_atom_traj[1][i-1] - seg
+                    delete_effects = seg - ground_atom_traj[1][i-1]
+                    #print("add_effects:", len(add_effects))
+                    #print("delete_effects:", len(delete_effects))
+                    if len(add_effects) == 0 and len(delete_effects) == 0:
+                        empty_transitions += 1
+            print(traj_i, empty_transitions)
+            traj_scores.append(empty_transitions)
+        sorted_indices = np.argsort(traj_scores)
+        trajectories = [trajectories[i] for i in sorted_indices]
+        ground_atom_dataset = [ground_atom_dataset[i] for i in sorted_indices]
+        ########################
         # STEP 1: Segment each trajectory in the dataset based on changes in
         #         either predicates or options. If we are doing option learning,
         #         then the data will not contain options, so this segmenting
