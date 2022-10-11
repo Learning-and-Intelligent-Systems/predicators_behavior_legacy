@@ -835,10 +835,10 @@ def _sesame_plan_with_fast_downward(
     else:
         skeleton_str = re.findall(r"(.+) \(\d+?\)", output)
         if not skeleton_str:
-            print(f"Init Atoms: {init_atoms}")
-            print(f"Task Goal: {task.goal}")
-            print(f"Domain String: {dom_file}")
-            print(f"Problem String: {prob_file}")
+            logging.info(f"Init Atoms: {init_atoms}")
+            logging.info(f"Task Goal: {task.goal}")
+            logging.info(f"Domain String: {dom_file}")
+            logging.info(f"Problem String: {prob_file}")
             raise PlanningFailure(f"Plan not found with FD! Error: {output}")
     skeleton = []
     atoms_sequence = [init_atoms]
