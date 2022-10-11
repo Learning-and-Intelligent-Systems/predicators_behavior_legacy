@@ -237,7 +237,6 @@ def create_place_inside_option_model(
                     obj_to_place_into.force_wakeup()
                     obj_in_hand.set_position_orientation(
                         target_pos, p.getQuaternionFromEuler(target_orn))
-
                     # this is running a zero action to step simulator
                     env.step(np.zeros(env.action_space.shape))
                     # reset the released object to zero velocity so it
