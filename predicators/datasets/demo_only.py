@@ -81,7 +81,6 @@ def create_demo_data(env: BaseEnv, train_tasks: List[Task],
                 gt_opt = gt_param_opt.ground(dummy_opt.objects,
                                              dummy_opt.params)
                 act.set_option(gt_opt)
-    import ipdb; ipdb.set_trace()
     return dataset
 
 
