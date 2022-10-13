@@ -311,6 +311,7 @@ class BehaviorEnv(BaseEnv):
             task = Task(init_state, goal)
             tasks.append(task)
             self.task_num += 1
+
         return tasks
 
     def _get_task_goal(self) -> Set[GroundAtom]:
