@@ -1,7 +1,9 @@
 {
     "collecting_aluminum_cans": {
-        "train": [],
-        "test": [19]
+        "Ihlen_1_int": {
+            "train": [],
+            "test": [19]
+        }
     }
 
 }
