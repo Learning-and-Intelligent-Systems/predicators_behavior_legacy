@@ -825,6 +825,7 @@ def _sesame_plan_with_fast_downward(
     try:
         assert len(num_nodes_expanded) == 1
     except AssertionError:
+        print(f"Output: {output}")
         print(f"Num Nodes Expanded: {num_nodes_expanded}")
         print(f"Init Atoms: {init_atoms}")
         print(f"Goal: {task.goal}")
@@ -834,6 +835,7 @@ def _sesame_plan_with_fast_downward(
     metrics["num_nodes_created"] = float(num_nodes_created[0])
     # Extract the skeleton from the output and compute the atoms_sequence.
     if "Solution found!" not in output:
+        import ipdb; ipdb.set_trace()
         raise PlanningFailure(f"Plan not found with FD! Error: {output}")
     if "Plan length: 0 step" in output:
         # Handle the special case where the plan is found to be trivial.
