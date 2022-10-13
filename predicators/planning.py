@@ -822,7 +822,13 @@ def _sesame_plan_with_fast_downward(
     metrics: Metrics = defaultdict(float)
     num_nodes_expanded = re.findall(r"Evaluated (\d+) state", output)
     num_nodes_created = re.findall(r"Generated (\d+) state", output)
-    assert len(num_nodes_expanded) == 1
+    try:
+        assert len(num_nodes_expanded) == 1
+    except AssertionError:
+        print(f"Num Nodes Expanded: {num_nodes_expanded}")
+        print(f"Init Atoms: {init_atoms}")
+        print(f"Goal: {task.goal}")
+        exit()
     assert len(num_nodes_created) == 1
     metrics["num_nodes_expanded"] = float(num_nodes_expanded[0])
     metrics["num_nodes_created"] = float(num_nodes_created[0])

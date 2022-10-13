@@ -266,6 +266,13 @@ class BehaviorEnv(BaseEnv):
                     self.task_instance_id = rng.integers(0, 10)
                 if len(CFG.behavior_task_list) != 1:
                     self.set_config_by_task_num(self.task_num)
+
+                print()
+                print(f"Task Num: {self.task_num}")
+                print(f"Task Instance ID: {self.task_instance_id}")
+                print(f"Curr Env Seed: {curr_env_seed}")
+                print()
+
                 self.set_igibson_behavior_env(
                     task_num=self.task_num,
                     task_instance_id=self.task_instance_id,
