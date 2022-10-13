@@ -72,7 +72,8 @@ class BehaviorEnv(BaseEnv):
         with open(path_to_broken_inst_file, 'rb') as f:
             self.task_to_broken_instances: Dict[str,
                                                 Dict[str,
-                                                     List[int]]] = json.load(f)
+                                                    Dict[str,
+                                                         List[int]]]] = json.load(f)
         # behavior_randomize_init_state will always be False in this
         # config_file because we are not using their scene samplers.
         # We are loading pre-computed scenes. Below we load either the
