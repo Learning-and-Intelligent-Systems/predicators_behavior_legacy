@@ -832,6 +832,7 @@ def _sesame_plan_with_fast_downward(
         logging.info(f"Task Goal: {task.goal}")
         logging.info(f"Domain String: {dom_file}")
         logging.info(f"Problem String: {prob_file}")
+        import ipdb; ipdb.set_trace()
         raise PlanningFailure(f"Plan not found with FD! Error: {output}")
     if "Plan length: 0 step" in output:
         # Handle the special case where the plan is found to be trivial.
