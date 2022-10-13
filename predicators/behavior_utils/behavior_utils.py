@@ -1,6 +1,7 @@
 """Utility functions for using iGibson and BEHAVIOR."""
 
 import os
+import logging
 from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -508,6 +509,10 @@ def load_checkpoint_state(s: State,
     # We step the environment to update the visuals of where the robot is!
     env.igibson_behavior_env.step(
         np.zeros(env.igibson_behavior_env.action_space.shape))
+
+    # Log important stuff for debugging
+    logging.info(f"new_task_num_task_instance_id: {new_task_num_task_instance_id}")
+    logging.info(f"curr_env_seed: {env.task_num_task_instance_id_to_igibson_seed[new_task_num_task_instance_id]}")
 
 
 def create_ground_atom_dataset_behavior(
