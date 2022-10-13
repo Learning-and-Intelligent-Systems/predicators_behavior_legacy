@@ -4,6 +4,13 @@
             "train": [],
             "test": [19]
         }
+    },
+
+    "sorting_books": {
+        "Pomaria_1_int": {
+            "train": [],
+            "test": [14]
+        }
     }
 
 }
