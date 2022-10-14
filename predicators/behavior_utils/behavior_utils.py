@@ -29,14 +29,6 @@ except (ImportError, ModuleNotFoundError) as e:  # pragma: no cover
 # LIS fork of the bddl repository. These sets might be incomplete, so
 # if you encounter an error while trying to solve a new BEHAVIOR task,
 # you might need to add to these.
-ALL_RELEVANT_OBJECT_TYPES = {
-    'breakfast_table', 'notebook', 'hardback', 'shelf', 'agent', 'room_floor',
-    'coffee_table', 'pop', 'bed', 'bucket', 'plate', 'hamburger', 'countertop',
-    'trash_can', 'backpack', 'toothbrush', 'shampoo', 'underwear', 'door',
-    'window', 'toothpaste', 'package', 'highlighter', 'swivel_chair',
-    'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet',
-    'top_cabinet', 'sofa'
-}
 PICK_PLACE_OBJECT_TYPES = {
     'mineral_water', 'oatmeal', 'blueberry', 'headset', 'jug', 'flank',
     'baseball', 'crab', 'dressing', 'cranberry', 'trout', 'kale', 'shoe',
@@ -181,7 +173,16 @@ OPENABLE_OBJECT_TYPES = {
     'crate', 'cabinet', 'joint', 'bottom_cabinet_no_top', 'fridge',
     'bottom_cabinet', 'trash_can'
 }
+ALL_RELEVANT_OBJECT_TYPES = {
+    'breakfast_table', 'notebook', 'hardback', 'shelf', 'agent', 'room_floor',
+    'coffee_table', 'pop', 'bed', 'bucket', 'plate', 'hamburger', 'countertop',
+    'trash_can', 'backpack', 'toothbrush', 'shampoo', 'underwear', 'door',
+    'window', 'toothpaste', 'package', 'highlighter', 'swivel_chair',
+    'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet',
+    'top_cabinet', 'sofa'
+}
 
+ALL_RELEVANT_OBJECT_TYPES = ALL_RELEVANT_OBJECT_TYPES | PICK_PLACE_OBJECT_TYPES | PLACE_INTO_SURFACE_OBJECT_TYPES | PLACE_ONTOP_SURFACE_OBJECT_TYPES | OPENABLE_OBJECT_TYPES
 
 def get_aabb_volume(lo: Array, hi: Array) -> float:
     """Simple utility function to compute the volume of an aabb.
