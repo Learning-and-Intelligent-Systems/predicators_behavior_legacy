@@ -11,7 +11,7 @@ from numpy.random._generator import Generator
 
 from predicators.behavior_utils.behavior_utils import detect_robot_collision, \
     get_aabb_volume, get_closest_point_on_aabb, get_scene_body_ids, \
-    reset_and_release_hand
+    reset_and_release_hand, get_aabb_centroid
 from predicators.structs import Array
 
 try:
@@ -22,9 +22,12 @@ try:
     from igibson.object_states.on_floor import \
         RoomFloor  # pylint: disable=unused-import
     from igibson.objects.articulated_object import URDFObject
+    from igibson.robots.behavior_robot import \
+        BehaviorRobot  # pylint: disable=unused-import
     from igibson.utils.behavior_robot_planning_utils import \
         plan_base_motion_br, plan_hand_motion_br
-
+    from igibson.external.pybullet_tools.utils import get_link_pose
+    import igibson.utils.transform_utils as T
 except (ImportError, ModuleNotFoundError) as e:
     pass
 
@@ -104,15 +107,25 @@ def make_navigation_plan(
     yaw_angle = np.arctan2(pos_offset[1], pos_offset[0]) - np.pi
     orn = [0, 0, yaw_angle]
     env.robots[0].set_position_orientation(pos, p.getQuaternionFromEuler(orn))
-    eye_pos = env.robots[0].parts["eye"].get_position()
+    if isinstance(env.robots[0], BehaviorRobot):
+        eye_pos = env.robots[0].parts["eye"].get_position()
+    else:
+        eye_pos = env.robots[0].parts["eyes"].get_position()
     ray_test_res = p.rayTest(eye_pos, obj_pos)
     # Test to see if the robot is obstructed by some object, but make sure
     # that object is not either the robot's body or the object we want to
     # pick up!
-    blocked = len(ray_test_res) > 0 and (ray_test_res[0][0] not in (
-        env.robots[0].parts["body"].get_body_id(),
-        obj.get_body_id(),
-    ))
+    if isinstance(env.robots[0], BehaviorRobot):
+        blocked = len(ray_test_res) > 0 and (ray_test_res[0][0] not in (
+            env.robots[0].parts["body"].get_body_id(),
+            obj.get_body_id(),
+        ))
+    else:
+        blocked = len(ray_test_res) > 0 and (ray_test_res[0][0] not in (
+            env.robots[0].get_body_id(),
+            obj.get_body_id(),
+        ))
+
     if not detect_robot_collision(env.robots[0]) and not blocked:
         valid_position = (pos, orn)
 
@@ -191,7 +204,10 @@ def make_grasp_plan(
     logging.info(f"PRIMITIVE: Attempting to grasp {obj.name} with params "
                  f"{grasp_offset}")
 
-    obj_in_hand = env.robots[0].parts["right_hand"].object_in_hand
+    if isinstance(env.robots[0], BehaviorRobot):
+        obj_in_hand = env.robots[0].parts["right_hand"].object_in_hand
+    else:
+        obj_in_hand = env.robots[0].object_in_hand
     # If we're holding something, fail and return None
     if obj_in_hand is not None:
         logging.info(f"PRIMITIVE: grasp {obj.name} fail, agent already has an "
@@ -230,7 +246,10 @@ def make_grasp_plan(
     x = obj_pos[0] + grasp_offset[0]
     y = obj_pos[1] + grasp_offset[1]
     z = obj_pos[2] + grasp_offset[2]
-    hand_x, hand_y, hand_z = (env.robots[0].parts["right_hand"].get_position())
+    if isinstance(env.robots[0], BehaviorRobot):
+        hand_x, hand_y, hand_z = (env.robots[0].parts["right_hand"].get_position())
+    else:
+        hand_x, hand_y, hand_z = env.robots[0].get_end_effector_position()
     minx = min(x, hand_x) - 0.5
     miny = min(y, hand_y) - 0.5
     minz = min(z, hand_z) - 0.5
@@ -286,33 +305,47 @@ def make_grasp_plan(
     if env.use_rrt:
         # plan a motion to the pose [x, y, z, euler_angles[0],
         # euler_angles[1], euler_angles[2]]
-        plan = plan_hand_motion_br(
-            robot=env.robots[0],
-            obj_in_hand=None,
-            end_conf=end_conf,
-            hand_limits=((minx, miny, minz), (maxx, maxy, maxz)),
-            obstacles=get_scene_body_ids(env,
-                                         include_self=True,
-                                         include_right_hand=True),
-            rng=rng,
-        )
+        if isinstance(env.robots[0], BehaviorRobot):
+            plan = plan_hand_motion_br(
+                robot=env.robots[0],
+                obj_in_hand=None,
+                end_conf=end_conf,
+                hand_limits=((minx, miny, minz), (maxx, maxy, maxz)),
+                obstacles=get_scene_body_ids(env,
+                                             include_self=True,
+                                             include_right_hand=True),
+                rng=rng,
+            )
+        else:
+            raise NotImplementedError('RRT hand motion planning is only implemented for the Behavior bot')
         p.restoreState(state)
     else:
-        pos = env.robots[0].parts["right_hand"].get_position()
-        plan = [[pos[0], pos[1], pos[2]] + list(
-            p.getEulerFromQuaternion(
-                env.robots[0].parts["right_hand"].get_orientation())),
-                end_conf]
+        if isinstance(env.robots[0], BehaviorRobot):
+            pos = env.robots[0].parts["right_hand"].get_position()
+            plan = [[pos[0], pos[1], pos[2]] + list(
+                p.getEulerFromQuaternion(
+                    env.robots[0].parts["right_hand"].get_orientation())),
+                    end_conf]
+        else:
+            pos = env.robots[0].get_end_effector_position()
+            orn = list(p.getEulerFromQuaternion(
+                T.mat2quat(T.pose2mat(get_link_pose(env.robots[0].robot_ids[0], env.robots[0].eef_link_id))[:3, :3])))
+            plan = [[pos[0], pos[1], pos[2], orn[0], orn[1], orn[2]], end_conf]
 
     # NOTE: This below line is *VERY* important after the
     # pybullet state is restored. The hands keep an internal
     # track of their state, and if we don't reset this
     # state to mirror the actual pybullet state, the hand will
     # think it's elsewhere and update incorrectly accordingly
-    env.robots[0].parts["right_hand"].set_position(
-        env.robots[0].parts["right_hand"].get_position())
-    env.robots[0].parts["left_hand"].set_position(
-        env.robots[0].parts["left_hand"].get_position())
+    if isinstance(env.robots[0], BehaviorRobot):
+        env.robots[0].parts["right_hand"].set_position(
+            env.robots[0].parts["right_hand"].get_position())
+        env.robots[0].parts["left_hand"].set_position(
+            env.robots[0].parts["left_hand"].get_position())
+    else:
+        # Unclear if this is necessary, but it doesn't seem to hurt
+        env.robots[0].parts["gripper_link"].set_position(
+            env.robots[0].get_end_effector_position())
 
     # If RRT planning fails, fail and return None
     if plan is None:
@@ -327,7 +360,10 @@ def make_grasp_plan(
     hand_orn = plan[-1][3:6]
     # Get the closest point on the object's bounding
     # box at which we can try to put the hand
-    closest_point_on_aabb = get_closest_point_on_aabb(hand_pos, lo, hi)
+    if isinstance(env.robots[0], BehaviorRobot):
+        closest_point_on_aabb = get_closest_point_on_aabb(hand_pos, lo, hi)
+    else:
+        closest_point_on_aabb = get_aabb_centroid(lo, hi)
     delta_pos_to_obj = [
         closest_point_on_aabb[0] - hand_pos[0],
         closest_point_on_aabb[1] - hand_pos[1],
@@ -350,10 +386,15 @@ def make_grasp_plan(
 
     p.restoreState(state)
     p.removeState(state)
-    original_orientation = list(
-        p.getEulerFromQuaternion(
-            env.robots[0].parts["right_hand"].get_orientation()))
-
+    if isinstance(env.robots[0], BehaviorRobot):
+        original_orientation = list(
+            p.getEulerFromQuaternion(
+                env.robots[0].parts["right_hand"].get_orientation()))
+    else:
+        original_orientation = list(
+            p.getEulerFromQuaternion(
+                T.mat2quat(T.pose2mat(get_link_pose(env.robots[0].robot_ids[0], env.robots[0].eef_link_id))[:3, :3])))
+        # original_orientation = env.robots[0].get_relative_eef_orientation()
     logging.info(f"PRIMITIVE: grasp {obj.name} success! Plan found with "
                  f"continuous params {grasp_offset}.")
     return plan, original_orientation
