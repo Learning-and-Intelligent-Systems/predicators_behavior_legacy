@@ -829,7 +829,11 @@ def _sesame_plan_with_fast_downward(
         print(f"Num Nodes Expanded: {num_nodes_expanded}")
         print(f"Init Atoms: {init_atoms}")
         print(f"Goal: {task.goal}")
+        print(f"Objects: {objects}")
+        env = get_or_create_env("behavior")
+        print(f"Task Relevant Types: {env.task_relevant_types}")
         exit()
+
     assert len(num_nodes_created) == 1
     metrics["num_nodes_expanded"] = float(num_nodes_expanded[0])
     metrics["num_nodes_created"] = float(num_nodes_created[0])
