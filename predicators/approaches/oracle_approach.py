@@ -46,10 +46,6 @@ class OracleApproach(BilevelPlanningApproach):
         return False
 
     def _get_current_predicates(self) -> Set[Predicate]:
-        """Get the current set of predicates.
-
-        Defaults to initial predicates.
-        """
         # If the env is BEHAVIOR, the predicates might change from one
         # task to another, so we need to recompute them.
         if CFG.env == "behavior":  # pragma: no cover
