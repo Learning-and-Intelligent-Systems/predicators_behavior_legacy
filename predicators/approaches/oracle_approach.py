@@ -55,7 +55,8 @@ class OracleApproach(BilevelPlanningApproach):
         # task to another, so we need to recompute them.
         if CFG.env == "behavior":
             env = get_or_create_env("behavior")
-            self._initial_predicates, _ = utils.parse_config_excluded_predicates(env)
+            self._initial_predicates, _ = utils.parse_config_excluded_predicates(
+                env)
         return self._initial_predicates
 
     def _get_current_nsrts(self) -> Set[NSRT]:
@@ -66,6 +67,5 @@ class OracleApproach(BilevelPlanningApproach):
             env = get_or_create_env("behavior")
             preds = self._get_current_predicates()
             self._initial_options = env.options
-            self._nsrts = get_gt_nsrts(preds,
-                                    self._initial_options)
+            self._nsrts = get_gt_nsrts(preds, self._initial_options)
         return self._nsrts

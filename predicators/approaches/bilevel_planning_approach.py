@@ -12,13 +12,14 @@ from gym.spaces import Box
 from predicators import utils
 from predicators.approaches import ApproachFailure, ApproachTimeout, \
     BaseApproach
+from predicators.behavior_utils.behavior_utils import load_checkpoint_state
 from predicators.envs import get_or_create_env
 from predicators.option_model import _OptionModelBase, create_option_model
 from predicators.planning import PlanningFailure, PlanningTimeout, sesame_plan
 from predicators.settings import CFG
 from predicators.structs import NSRT, Action, Metrics, ParameterizedOption, \
     Predicate, State, Task, Type, _Option
-from predicators.behavior_utils.behavior_utils import load_checkpoint_state
+
 
 class BilevelPlanningApproach(BaseApproach):
     """Bilevel planning approach."""
