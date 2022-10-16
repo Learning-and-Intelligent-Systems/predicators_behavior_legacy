@@ -291,9 +291,6 @@ class BehaviorEnv(BaseEnv):
                                 self.task_instance_id = rng.integers(0, 10)
                 if len(CFG.behavior_task_list) != 1:
                     self.set_config_by_task_num(self.task_num)
-
-                # self.task_instance_id = 18
-
                 self.set_igibson_behavior_env(
                     task_num=self.task_num,
                     task_instance_id=self.task_instance_id,
