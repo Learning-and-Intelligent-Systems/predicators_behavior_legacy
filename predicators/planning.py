@@ -832,6 +832,7 @@ def _sesame_plan_with_fast_downward(
         print(f"Objects: {objects}")
         env = get_or_create_env("behavior")
         print(f"Task Relevant Types: {env.task_relevant_types}")
+        print(f"Env Predicates: {env.predicates}")
         print(f"Domain String: {dom_str}")
         print(f"Problem String: {prob_str}")
         exit()
