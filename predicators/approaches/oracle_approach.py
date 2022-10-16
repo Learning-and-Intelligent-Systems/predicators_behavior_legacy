@@ -14,7 +14,6 @@ from predicators import utils
 from predicators.approaches.bilevel_planning_approach import \
     BilevelPlanningApproach
 from predicators.envs import get_or_create_env
-from predicators.envs.base_env import BaseEnv
 from predicators.ground_truth_nsrts import get_gt_nsrts
 from predicators.settings import CFG
 from predicators.structs import NSRT, ParameterizedOption, Predicate, Task, \
@@ -55,8 +54,8 @@ class OracleApproach(BilevelPlanningApproach):
         # task to another, so we need to recompute them.
         if CFG.env == "behavior":
             env = get_or_create_env("behavior")
-            self._initial_predicates, _ = utils.parse_config_excluded_predicates(
-                env)
+            self._initial_predicates, _ = \
+                utils.parse_config_excluded_predicates(env)
         return self._initial_predicates
 
     def _get_current_nsrts(self) -> Set[NSRT]:

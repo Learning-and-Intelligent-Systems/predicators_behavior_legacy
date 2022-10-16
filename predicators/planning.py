@@ -824,31 +824,20 @@ def _sesame_plan_with_fast_downward(
     num_nodes_created = re.findall(r"Generated (\d+) state", output)
     try:
         assert len(num_nodes_expanded) == 1
+        assert len(num_nodes_created) == 1
+    # In case the following exception is raised, the below info
+    # is extremely helpful for debugging.
     except AssertionError:
-        print(f"Output: {output}")
-        print(f"Num Nodes Expanded: {num_nodes_expanded}")
-        print(f"Init Atoms: {init_atoms}")
-        print(f"Goal: {task.goal}")
-        print(f"Objects: {objects}")
+        logging.info(f"Output: {output}")
+        logging.info(f"Num Nodes Expanded: {num_nodes_expanded}")
+        logging.info(f"Init Atoms: {init_atoms}")
+        logging.info(f"Goal: {task.goal}")
+        logging.info(f"Objects: {objects}")
         env = get_or_create_env("behavior")
-        print(f"Task Relevant Types: {env.task_relevant_types}")
-        print(f"Env Predicates: {env.predicates}")
-        print(f"Domain String: {dom_str}")
-        print(f"Problem String: {prob_str}")
-        exit()
-
-    # print(f"Output: {output}")
-    # print(f"Num Nodes Expanded: {num_nodes_expanded}")
-    # print(f"Init Atoms: {init_atoms}")
-    # print(f"Goal: {task.goal}")
-    # print(f"Objects: {objects}")
-    # env = get_or_create_env("behavior")
-    # print(f"Task Relevant Types: {env.task_relevant_types}")
-    # print(f"Domain String: {dom_str}")
-    # print(f"Problem String: {prob_str}")
-    # import ipdb; ipdb.set_trace()
-
-    assert len(num_nodes_created) == 1
+        logging.info(f"Task Relevant Types: {env.task_relevant_types}")
+        logging.info(f"Env Predicates: {env.predicates}")
+        logging.info(f"Domain String: {dom_str}")
+        logging.info(f"Problem String: {prob_str}")
     metrics["num_nodes_expanded"] = float(num_nodes_expanded[0])
     metrics["num_nodes_created"] = float(num_nodes_created[0])
     # Extract the skeleton from the output and compute the atoms_sequence.
