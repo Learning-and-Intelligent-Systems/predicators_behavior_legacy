@@ -54,7 +54,7 @@ class BilevelPlanningApproach(BaseApproach):
         # If we're running on BEHAVIOR, we need to make sure we are
         # currently in the correct environment/task so that we can
         # get the correct predicates and NSRTs to run our planner.
-        if CFG.env == "behavior":
+        if CFG.env == "behavior":  # pragma: no cover
             env = get_or_create_env("behavior")
             assert isinstance(env, BehaviorEnv)
             if not task.init.allclose(

@@ -52,7 +52,7 @@ class OracleApproach(BilevelPlanningApproach):
         """
         # If the env is BEHAVIOR, the predicates might change from one
         # task to another, so we need to recompute them.
-        if CFG.env == "behavior":
+        if CFG.env == "behavior":  # pragma: no cover
             env = get_or_create_env("behavior")
             self._initial_predicates, _ = \
                 utils.parse_config_excluded_predicates(env)
