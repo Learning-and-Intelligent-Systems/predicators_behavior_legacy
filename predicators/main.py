@@ -265,9 +265,6 @@ def _run_testing(env: BaseEnv, approach: BaseApproach) -> Metrics:
         # Run the approach's solve() method to get a policy for this task.
         solve_start = time.time()
         try:
-            if CFG.approach == "oracle":
-                assert isinstance(approach, OracleApproach)
-                approach.recompute_nsrts(env)
             policy = approach.solve(task, timeout=CFG.timeout)
         except (ApproachTimeout, ApproachFailure) as e:
             logging.info(f"Task {test_task_idx+1} / {len(test_tasks)}: "
