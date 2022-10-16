@@ -12,6 +12,9 @@ from gym.spaces import Box
 from predicators import utils
 from predicators.approaches import ApproachFailure, ApproachTimeout, \
     BaseApproach
+from predicators.behavior_utils.behavior_utils import load_checkpoint_state
+from predicators.envs import get_or_create_env
+from predicators.envs.behavior import BehaviorEnv
 from predicators.option_model import _OptionModelBase, create_option_model
 from predicators.planning import PlanningFailure, PlanningTimeout, sesame_plan
 from predicators.settings import CFG
@@ -47,6 +50,17 @@ class BilevelPlanningApproach(BaseApproach):
         self._num_calls += 1
         # ensure random over successive calls
         seed = self._seed + self._num_calls
+
+        # If we're running on BEHAVIOR, we need to make sure we are
+        # currently in the correct environment/task so that we can
+        # get the correct predicates and NSRTs to run our planner.
+        if CFG.env == "behavior":  # pragma: no cover
+            env = get_or_create_env("behavior")
+            assert isinstance(env, BehaviorEnv)
+            if not task.init.allclose(
+                    env.current_ig_state_to_state(save_state=False)):
+                load_checkpoint_state(task.init, env)
+
         nsrts = self._get_current_nsrts()
         preds = self._get_current_predicates()
         plan, metrics, traj = self._run_sesame_plan(task, nsrts, preds,

@@ -822,8 +822,23 @@ def _sesame_plan_with_fast_downward(
     metrics: Metrics = defaultdict(float)
     num_nodes_expanded = re.findall(r"Evaluated (\d+) state", output)
     num_nodes_created = re.findall(r"Generated (\d+) state", output)
-    assert len(num_nodes_expanded) == 1
-    assert len(num_nodes_created) == 1
+    try:
+        assert len(num_nodes_expanded) == 1
+        assert len(num_nodes_created) == 1
+    # In case the following exception is raised, the below info
+    # is extremely helpful for debugging.
+    except AssertionError:
+        logging.info(f"Output: {output}")
+        logging.info(f"Num Nodes Expanded: {num_nodes_expanded}")
+        logging.info(f"Init Atoms: {init_atoms}")
+        logging.info(f"Goal: {task.goal}")
+        logging.info(f"Objects: {objects}")
+        env = get_or_create_env("behavior")
+        assert isinstance(env, BehaviorEnv)
+        logging.info(f"Task Relevant Types: {env.task_relevant_types}")
+        logging.info(f"Env Predicates: {env.predicates}")
+        logging.info(f"Domain String: {dom_str}")
+        logging.info(f"Problem String: {prob_str}")
     metrics["num_nodes_expanded"] = float(num_nodes_expanded[0])
     metrics["num_nodes_created"] = float(num_nodes_created[0])
     # Extract the skeleton from the output and compute the atoms_sequence.
