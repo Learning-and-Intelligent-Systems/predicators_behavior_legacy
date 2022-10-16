@@ -14,6 +14,7 @@ from predicators.approaches import ApproachFailure, ApproachTimeout, \
     BaseApproach
 from predicators.behavior_utils.behavior_utils import load_checkpoint_state
 from predicators.envs import get_or_create_env
+from predicators.envs.behavior import BehaviorEnv
 from predicators.option_model import _OptionModelBase, create_option_model
 from predicators.planning import PlanningFailure, PlanningTimeout, sesame_plan
 from predicators.settings import CFG
@@ -55,6 +56,7 @@ class BilevelPlanningApproach(BaseApproach):
         # get the correct predicates and NSRTs to run our planner.
         if CFG.env == "behavior":
             env = get_or_create_env("behavior")
+            assert isinstance(env, BehaviorEnv)
             if not task.init.allclose(
                     env.current_ig_state_to_state(save_state=False)):
                 load_checkpoint_state(task.init, env)

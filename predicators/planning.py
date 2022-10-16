@@ -834,6 +834,7 @@ def _sesame_plan_with_fast_downward(
         logging.info(f"Goal: {task.goal}")
         logging.info(f"Objects: {objects}")
         env = get_or_create_env("behavior")
+        assert isinstance(env, BehaviorEnv)
         logging.info(f"Task Relevant Types: {env.task_relevant_types}")
         logging.info(f"Env Predicates: {env.predicates}")
         logging.info(f"Domain String: {dom_str}")
