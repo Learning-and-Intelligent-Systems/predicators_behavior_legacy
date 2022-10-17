@@ -37,7 +37,8 @@ ALL_RELEVANT_OBJECT_TYPES = {
     'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet',
     'top_cabinet', 'sofa', 'oatmeal', 'countertop', 'chip', 'vegetable_oil',
     'sugar', 'cabinet', 'floor', 'pasta', 'sauce', 'electric_refrigerator',
-    'countertop'
+    'countertop', 'olive_oil', 'sugar_jar', 'spaghetti_sauce', 'mayonnaise',
+    'fridge'
 }
 PICK_PLACE_OBJECT_TYPES = {
     'mineral_water', 'oatmeal', 'blueberry', 'headset', 'jug', 'flank',
