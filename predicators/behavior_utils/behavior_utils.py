@@ -35,7 +35,9 @@ ALL_RELEVANT_OBJECT_TYPES = {
     'trash_can', 'backpack', 'toothbrush', 'shampoo', 'underwear', 'door',
     'window', 'toothpaste', 'package', 'highlighter', 'swivel_chair',
     'document', 'bottom_cabinet_no_top', 'folder', 'bottom_cabinet',
-    'top_cabinet', 'sofa'
+    'top_cabinet', 'sofa', 'oatmeal', 'chip', 'vegetable_oil', 'sugar',
+    'cabinet', 'floor', 'pasta', 'sauce', 'electric_refrigerator', 'olive_oil',
+    'sugar_jar', 'spaghetti_sauce', 'mayonnaise', 'fridge'
 }
 PICK_PLACE_OBJECT_TYPES = {
     'mineral_water', 'oatmeal', 'blueberry', 'headset', 'jug', 'flank',
