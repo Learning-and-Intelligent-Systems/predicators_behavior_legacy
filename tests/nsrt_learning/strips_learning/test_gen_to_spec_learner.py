@@ -293,8 +293,7 @@ def test_backchaining_strips_learner_order_dependence():
         "strips_learner": "backchaining",
         # Following are necessary to solve this case.
         "data_orderings_to_search": 10,
-        "enable_harmless_op_pruning": True,
-        "disable_harmlessness_check": False
+        "enable_harmless_op_pruning": True
     })
     # Agent features are loc: 0, 1, 2, 3 [start, shelf1, shelf2, far away];
     # holding: True or False whether an object is in hand
@@ -1261,7 +1260,7 @@ def test_multi_pass_backchaining(val):
             """STRIPS-Pick:
     Parameters: []
     Preconditions: [A()]
-    Add Effects: [B(), C()]
+    Add Effects: [B()]
     Delete Effects: []
     Ignore Effects: []
     Option Spec: Pick()""", """STRIPS-Place:
@@ -1273,7 +1272,7 @@ def test_multi_pass_backchaining(val):
     Option Spec: Place()""", """STRIPS-Place:
     Parameters: []
     Preconditions: [A(), B()]
-    Add Effects: [C(), D(), E()]
+    Add Effects: [C(), D()]
     Delete Effects: [B()]
     Ignore Effects: []
     Option Spec: Place()"""
