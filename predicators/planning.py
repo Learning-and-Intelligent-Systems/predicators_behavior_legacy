@@ -191,7 +191,7 @@ def _sesame_plan_with_astar(
             for skeleton, atoms_sequence in gen:
                 necessary_atoms_seq = utils.compute_necessary_atoms_seq(
                     skeleton, atoms_sequence, task.goal)
-                plan, suc = run_low_level_search(
+                plan, suc, traj = run_low_level_search(
                     task, option_model, skeleton, necessary_atoms_seq,
                     new_seed, timeout - (time.perf_counter() - start_time),
                     max_horizon)
@@ -873,7 +873,7 @@ def _sesame_plan_with_fast_downward(
     try:
         necessary_atoms_seq = utils.compute_necessary_atoms_seq(
             skeleton, atoms_sequence, task.goal)
-        plan, suc = run_low_level_search(task, option_model, skeleton,
+        plan, suc, traj = run_low_level_search(task, option_model, skeleton,
                                          necessary_atoms_seq, seed,
                                          low_level_timeout, max_horizon)
     except _DiscoveredFailureException:
