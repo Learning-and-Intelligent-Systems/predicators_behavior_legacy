@@ -151,31 +151,59 @@ def create_place_option_model(
 
     def placeOntopObjectOptionModel(_init_state: State,
                                     env: "BehaviorEnv") -> None:
-        released_obj_bid = env.robots[0].parts["right_hand"].object_in_hand
-        rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
-        )
-        rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
-        target_pos = plan[-1][0:3]
-        target_orn = plan[-1][3:6]
-        env.robots[0].parts["right_hand"].set_position_orientation(
-            target_pos, p.getQuaternionFromEuler(target_orn))
-        env.robots[0].parts["right_hand"].force_release_obj()
-        obj_to_place.force_wakeup()
-        # this is running a zero action to step simulator
-        env.step(np.zeros(env.action_space.shape))
-        # reset the released object to zero velocity so it doesn't
-        # fly away because of residual warp speeds from teleportation!
-        p.resetBaseVelocity(
-            released_obj_bid,
-            linearVelocity=[0, 0, 0],
-            angularVelocity=[0, 0, 0],
-        )
-        env.robots[0].parts["right_hand"].set_position_orientation(
-            rh_orig_grasp_postion, rh_orig_grasp_orn)
-        # this is running a series of zero action to step simulator
-        # to let the object fall into its place
-        for _ in range(15):
+        if isinstance(env.robots[0], BehaviorRobot):
+            released_obj_bid = env.robots[0].parts["right_hand"].object_in_hand
+            rh_orig_grasp_postion = env.robots[0].parts["right_hand"].get_position(
+            )
+            rh_orig_grasp_orn = env.robots[0].parts["right_hand"].get_orientation()
+            target_pos = plan[-1][0:3]
+            target_orn = plan[-1][3:6]
+            env.robots[0].parts["right_hand"].set_position_orientation(
+                target_pos, p.getQuaternionFromEuler(target_orn))
+            env.robots[0].parts["right_hand"].force_release_obj()
+            obj_to_place.force_wakeup()
+            # this is running a zero action to step simulator
             env.step(np.zeros(env.action_space.shape))
+            # reset the released object to zero velocity so it doesn't
+            # fly away because of residual warp speeds from teleportation!
+            p.resetBaseVelocity(
+                released_obj_bid,
+                linearVelocity=[0, 0, 0],
+                angularVelocity=[0, 0, 0],
+            )
+            env.robots[0].parts["right_hand"].set_position_orientation(
+                rh_orig_grasp_postion, rh_orig_grasp_orn)
+            # this is running a series of zero action to step simulator
+            # to let the object fall into its place
+            for _ in range(15):
+                env.step(np.zeros(env.action_space.shape))
+        else:
+            robot = env.robots[0]
+            released_obj_bid = robot.object_in_hand
+            orig_joint_positions = get_joint_positions(robot.robot_ids[0], robot.joint_ids)
+            target_pos = plan[-1][0:3]
+            target_orn = plan[-1][3:6]
+
+            robot.set_eef_position(target_pos)  # ignore target orientation
+            a = np.zeros(env.action_space.shape, dtype=float)
+            a[10] = 1.0
+            for _ in range(5):
+                env.step(a)
+            obj_to_place.force_wakeup()
+            # this is running a zero action to step simulator
+            env.step(np.zeros(env.action_space.shape))
+            # reset the released object to zero velocity so it doesn't
+            # fly away because of residual warp speeds from teleportation!
+            p.resetBaseVelocity(
+                released_obj_bid,
+                linearVelocity=[0, 0, 0],
+                angularVelocity=[0, 0, 0],
+            )
+            robot.set_joint_positions(orig_joint_positions)
+            # this is running a series of zero action to step simulator
+            # to let the object fall into its place
+            for _ in range(15):
+                env.step(np.zeros(env.action_space.shape))
 
     return placeOntopObjectOptionModel
 

@@ -244,12 +244,14 @@ def get_scene_body_ids(
     return ids
 
 
-def detect_collision(bodyA: int, object_in_hand: Optional[int] = None) -> bool:
+def detect_collision(bodyA: int, ignore_objects: List[Optional[int]] = None) -> bool:
     """Detects collisions between bodyA in the scene (except for the object in
     the robot's hand)"""
+    if not isinstance(ignore_objects, list):
+        ignore_objects = [ignore_objects]
     collision = False
     for body_id in range(p.getNumBodies()):
-        if body_id in [bodyA, object_in_hand]:
+        if body_id in ([bodyA] + ignore_objects):
             continue
         closest_points = p.getClosestPoints(bodyA, body_id, distance=0.01)
         if len(closest_points) > 0:
@@ -267,8 +269,14 @@ def detect_robot_collision(robot: "BaseRobot") -> bool:
                 or detect_collision(robot.parts["left_hand"].body_id)
                 or detect_collision(robot.parts["right_hand"].body_id,
                                     object_in_hand))
-    object_in_hand = robot.object_in_hand
-    return detect_collision(robot.body_id, object_in_hand)
+    
+    from predicators.envs import \
+        get_or_create_env  # pylint: disable=import-outside-toplevel
+    env = get_or_create_env("behavior")
+    ignore_objects = [robot.object_in_hand] 
+    for obj in env.igibson_behavior_env.scene.objects_by_category["floors"]:
+        ignore_objects.append(obj.get_body_id())
+    return detect_collision(robot.body_id, ignore_objects)
 
 
 def reset_and_release_hand(env: "BehaviorEnv") -> None:
@@ -459,10 +467,17 @@ def check_hand_end_pose(env: "BehaviorEnv", obj: Union["URDFObject",
         pos_offset[1] + obj_pos[1],
         pos_offset[2] + obj_pos[2],
     )
-    env.robots[0].parts["right_hand"].set_position(hand_pos)
-    if not detect_robot_collision(env.robots[0]):
-        ret_bool = True
-
+    if isinstance(env.robots[0], BehaviorRobot):
+        env.robots[0].parts["right_hand"].set_position(hand_pos)
+        if not detect_robot_collision(env.robots[0]):
+            ret_bool = True
+    else:
+        env.robots[0].set_eef_position(hand_pos)
+        sim_position = env.robots[0].get_end_effector_position()
+        target_position = hand_pos
+        if np.all(np.abs(sim_position - target_position) < 1e-1) \
+            and not detect_robot_collision(env.robots[0]):
+            ret_bool = True
     p.restoreState(state)
     p.removeState(state)
 
