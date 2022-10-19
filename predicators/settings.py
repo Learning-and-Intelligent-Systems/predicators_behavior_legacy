@@ -72,6 +72,7 @@ class GlobalSettings:
     # blocks env parameters
     blocks_num_blocks_train = [3, 4]
     blocks_num_blocks_test = [5, 6]
+    blocks_test_task_json_dir = None
 
     # playroom env parameters
     playroom_num_blocks_train = [3]
