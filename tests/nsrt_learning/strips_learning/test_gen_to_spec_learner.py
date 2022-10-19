@@ -1261,7 +1261,7 @@ def test_multi_pass_backchaining(val):
             """STRIPS-Pick:
     Parameters: []
     Preconditions: [A()]
-    Add Effects: [B(), C()]
+    Add Effects: [B()]
     Delete Effects: []
     Ignore Effects: []
     Option Spec: Pick()""", """STRIPS-Place:
@@ -1273,7 +1273,7 @@ def test_multi_pass_backchaining(val):
     Option Spec: Place()""", """STRIPS-Place:
     Parameters: []
     Preconditions: [A(), B()]
-    Add Effects: [C(), D(), E()]
+    Add Effects: [C(), D()]
     Delete Effects: [B()]
     Ignore Effects: []
     Option Spec: Place()"""
