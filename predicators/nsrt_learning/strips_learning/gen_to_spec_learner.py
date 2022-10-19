@@ -347,7 +347,6 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
                                             key=str):
             pnads_with_keep_effects = set()
             for pnad in nec_pnad_list:
-                self._compute_extra_add_effects(pnad)
                 self._compute_pnad_delete_effects(pnad)
                 self._compute_pnad_ignore_effects(pnad)
                 pnads_with_keep_effects |= self._get_pnads_with_keep_effects(
@@ -456,45 +455,6 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
         return new_pnad
 
     @staticmethod
-    def _compute_extra_add_effects(pnad: PartialNSRTAndDatastore) -> None:
-        """Update the given PNAD to have the add effects include _all_ effects
-        that are consistently added in the pnad's datastore (regardless of
-        whether they are necessary).
-
-        IMPORTANT NOTE: We do not allow creating new variables when we
-        create these add effects. Instead, we filter out add effects
-        that include new variables. What this method is overall doing is
-        just adding in 'unnecessary' add effects that co-occur with
-        necessary add effects that we should have already induced.
-        """
-        op_without_ignore = pnad.op.copy_with(ignore_effects=set())
-        new_add_effects = set()
-        for i, (segment, var_to_obj) in enumerate(pnad.datastore):
-            objs = tuple(var_to_obj[param]
-                         for param in op_without_ignore.parameters)
-            ground_op = op_without_ignore.ground(objs)
-            next_atoms = utils.apply_operator(ground_op, segment.init_atoms)
-            obj_to_var = {o: v for v, o in var_to_obj.items()}
-            unmodeled_add_effects = segment.add_effects - (next_atoms -
-                                                           segment.init_atoms)
-            potential_add_effects = {
-                atom
-                for atom in unmodeled_add_effects
-                if all(o in obj_to_var for o in atom.objects)
-            }
-            lifted_potential_add_effects = {
-                atom.lift(obj_to_var)
-                for atom in potential_add_effects
-            }
-            if i == 0:
-                new_add_effects = lifted_potential_add_effects
-            else:
-                new_add_effects &= lifted_potential_add_effects
-
-        pnad.op = pnad.op.copy_with(add_effects=pnad.op.add_effects
-                                    | new_add_effects)
-
-    @staticmethod
     def _compute_pnad_delete_effects(pnad: PartialNSRTAndDatastore) -> None:
         """Update the given PNAD to change the delete effects to ones obtained
         by unioning all lifted images in the datastore.
@@ -534,8 +494,10 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
             objs = tuple(var_to_obj[param] for param in pnad.op.parameters)
             ground_op = pnad.op.ground(objs)
             next_atoms = utils.apply_operator(ground_op, segment.init_atoms)
-            for atom in segment.final_atoms - next_atoms:
-                ignore_effects.add(atom.predicate)
+            # Note that we only induce ignore effects for atoms that are
+            # predicted to be in the next_atoms but are not actually there
+            # (since the converse doesn't change the soundness of our
+            # planning strategy).
             for atom in next_atoms - segment.final_atoms:
                 ignore_effects.add(atom.predicate)
         pnad.op = pnad.op.copy_with(ignore_effects=ignore_effects)
@@ -547,11 +509,14 @@ class BackchainingSTRIPSLearner(GeneralToSpecificSTRIPSLearner):
         PNAD."""
         # The keep effects that we want are the subset of possible keep
         # effects which are not already in the PNAD's add effects, and
-        # whose predicates were determined to be ignore effects.
+        # whose predicates were either (i) determined to be ignore effects,
+        # or (ii) in the delete effects.
         keep_effects = {
             eff
-            for eff in pnad.poss_keep_effects if eff not in pnad.op.add_effects
-            and eff.predicate in pnad.op.ignore_effects
+            for eff in pnad.poss_keep_effects
+            if eff not in pnad.op.add_effects and (
+                eff.predicate in pnad.op.ignore_effects
+                or eff in pnad.op.delete_effects)
         }
         new_pnads_with_keep_effects = set()
         # Given these keep effects, we need to create a combinatorial number of
