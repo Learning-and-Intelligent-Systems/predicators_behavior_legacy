@@ -874,8 +874,8 @@ def _sesame_plan_with_fast_downward(
         necessary_atoms_seq = utils.compute_necessary_atoms_seq(
             skeleton, atoms_sequence, task.goal)
         plan, suc, traj = run_low_level_search(task, option_model, skeleton,
-                                         necessary_atoms_seq, seed,
-                                         low_level_timeout, max_horizon)
+                                               necessary_atoms_seq, seed,
+                                               low_level_timeout, max_horizon)
     except _DiscoveredFailureException:
         # If we get a DiscoveredFailure, give up. Note that we cannot
         # modify the NSRTs as we do in SeSamE with A*, because we don't ever
