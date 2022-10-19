@@ -90,10 +90,6 @@ def _create_exposed_pybullet_cover_env(request):
 def test_pybullet_cover_reset(env):
     """Tests for PyBulletCoverEnv.reset()."""
     for idx, task in enumerate(env.get_train_tasks()):
-        try:
-            assert isinstance(task.init, utils.PyBulletState)
-        except AssertionError:
-            import ipdb; ipdb.set_trace()
         state = env.reset("train", idx)
         assert state.allclose(task.init)
     for idx, task in enumerate(env.get_test_tasks()):
